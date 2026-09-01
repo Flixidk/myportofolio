@@ -25,17 +25,6 @@ You can follow these steps to run the application locally on your machine.
 **Windows:** 
 ```bash
 python -m venv env
-```
-
-**Unix (macOS, Linux):**
-```bash
-python3 -m venv env
-```
-
-### 2. Setup & Activate Virtual Environment  
-**Windows:** 
-```bash
-python -m venv env
 env\Scripts\activate
 ```
 
