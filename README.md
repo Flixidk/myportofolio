@@ -15,7 +15,7 @@ A simple dynamic portofolio web app built using Django for my Platform-Based Pro
 
 You can follow these steps to run the application locally on your machine. 
 
-### 1. Clone the repostiory: 
+### 1. Clone the repository: 
 ```bash
    git clone https://github.com/Flixidk/myportofolio.git
    cd your-repo-name
