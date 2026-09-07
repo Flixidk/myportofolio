@@ -12,6 +12,7 @@
     - Deployed my website to PWS 
 - Finished Individual Assignment 1 where I:
     - Added a new section regarding Education below the About Me section
+    - Added a cascading fading in animation that plays in the Education section (part of extra UI/UX elements for extra feature grade in rubric)
 
 ## ✅ Pertanyaan Reflektif: 
 **Tugas Individu 1:**
@@ -25,7 +26,7 @@
 **How it was Used :**
 - Saat mengerjakan Tutorial 0, saya menggunakan Gemini untuk menjelaskan berbagai steps ketika melakukan set up untuk project portofolio ini karena saya kurang familiar dengan menggunakan Django, membuat file .env, tujuan membuat file seperti itu, dsb. Saya juga menggunakan AI untuk membantu saya dalam outlining apa yang harus masuk ke dalam dokumentasi dan bagaimana melakukan set-up dokumentasi yang lengkap. Saya memutuskan untuk melakukan hal ini dikarenakan terdapat rubrik terkait dokumentasi dan saya juga ingin membangun habit dan belajar cara bagaimana membuat dokumentasi yang professional.
 - Saat mengerjakan Tutorial 1, saya menggunakan Gemini hanya untuk menjelaskan berbagai steps ketika melakukan set up file dan folder Django, serta untuk menjelaskan syntax dan struktur file HTML dan CSS.
-- Saat mengerjakan Tugas Individu 1, saya menggunakan Gemini untuk menjelaskan ulang struktur HTML dan CSS styling dari keseluruhan website. Lalu, karena saya memang kurang familiar dengan syntax CSS dan bagaimana styling yang baik, saya banyak melemparkan pertanyaan ke Gemini bagaimana mengimplementasi suatu fitur atau perubahan pada website untuk melihat kodenya. Disini saya memang banyak melakukan copy paste, namun saya tetap berprinsip dengan tidak meminta Gemini untuk mengenerate keseluruhan website (one-shot) pada 1 prompt. Namun, saya tetap melakukannya bertahap dan per fitur, dengan mengibaratkan saya melakukan codingnya secara terstruktur, dan menggunakan Gemini untuk syntaxnya. 
+- Saat mengerjakan Tugas Individu 1, saya menggunakan Gemini untuk menjelaskan ulang struktur HTML dan CSS styling dari keseluruhan website. Lalu, karena saya memang kurang familiar dengan syntax CSS dan bagaimana styling yang baik, saya banyak melemparkan pertanyaan ke Gemini bagaimana mengimplementasi suatu fitur atau perubahan pada website untuk melihat kodenya. Disini saya memang banyak melakukan copy paste, namun saya tetap berprinsip dengan tidak meminta Gemini untuk mengenerate keseluruhan website (one-shot) pada 1 prompt melainkan saya tetap melakukannya bertahap dan per fitur, dengan mengibaratkan saya melakukan codingnya secara terstruktur, dan menggunakan Gemini untuk syntaxnya. Saya juga mengandalkan Gemini untuk membantu saya mengimplementasi feature animasi yang saya inginkan dengan menggunakan potongan kode JavaScript yang singkat karena saya belum pernah menggunakannya.
 
 **Chat History Links** :  
 [Chat for Tutorial 0](https://gemini.google.com/share/d/1I9uXUnEVEyTI4dFoSONo7znqeuElRJS5?usp=sharing)  
