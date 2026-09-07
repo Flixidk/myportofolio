@@ -21,6 +21,7 @@
     </header>
 
     <main>
+        <!-- Main Hero Section -->
         <section class="hero" id="profile">
             <div class="container hero-grid">
                 <div class="hero-identity">
@@ -52,6 +53,7 @@
             </div>
         </section>
 
+        <!-- Education Timeline Section -->
         <section class="education-section" id="education">
             <div class="container">
                 <h2>Education</h2>
@@ -110,5 +112,26 @@
             <p>&copy; 2026 Nanta. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
         </div>
     </footer>
+
+    <!--Script for Timeline Animation-->
+    <script>
+        // Set up an observer object so that the is-visible class gets added when elements go into screen view 
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target); 
+                }
+            });
+        }, { 
+            threshold: 0.5 // Triggers when half of the element is on the screen
+        });
+
+        // Attach that observer object to only observe the education-section class in our HTML
+        const educationSection = document.querySelector('.education-section');
+        if (educationSection) {
+            observer.observe(educationSection);
+        }
+    </script>
 </body>
 </html>
