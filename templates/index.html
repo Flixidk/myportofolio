@@ -116,6 +116,9 @@
 
     <!--Script for Timeline Animation-->
     <script>
+        // Set dynamic threshold value for screen scrolling in desktop/mobile view
+        const isMobile = window.matchMedia('(max-width: 600px)').matches;
+        const dynamicThreshold = isMobile ? 0.05 : 0.5;
         // Set up an observer object so that the is-visible class gets added when elements go into screen view 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -125,7 +128,7 @@
                 }
             });
         }, { 
-            threshold: 0.5 // Triggers when half of the element is on the screen
+            threshold: dynamicThreshold // Triggers according to the dynamic threshold set by specific desktop/mobile view
         });
 
         // Attach that observer object to only observe the education-section class in our HTML

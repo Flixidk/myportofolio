@@ -351,6 +351,7 @@ h1, .brand {
     font-weight: 600;
 }
 
+/* Additional responsive settings for mobile view */
 @media (max-width: 600px) {
     .hero-grid {
         grid-template-columns: 1fr;
@@ -366,6 +367,39 @@ h1, .brand {
 
     .social-links {
         justify-content: flex-start;
+    }
+
+    .education-timeline::before {
+        left: 20px;
+    }
+
+    .timeline-node {
+        left: 20px;
+    }
+
+    .timeline-item,
+    .timeline-item:nth-child(even) {
+        justify-content: flex-start;
+        padding-left: 45px; 
+        padding-right: 0;
+    }
+
+    .timeline-content {
+        width: 100%;
+    }
+    
+    .timeline-date,
+    .timeline-item .timeline-date,
+    .timeline-item:nth-child(even) .timeline-date {
+        position: static;
+        width: 100%;
+        text-align: left;
+        margin-bottom: 0.5rem;
+    }
+
+    .is-visible .timeline-item:nth-child(odd) .timeline-content,
+    .is-visible .timeline-item:nth-child(even) .timeline-content {
+        animation: slideInRight 0.6s ease-out forwards;
     }
 }
 
