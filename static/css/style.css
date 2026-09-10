@@ -72,6 +72,25 @@ h1, .brand {
     border-top: 1px solid var(--line);
 }
 
+@media (max-width: 600px) {
+    .site-header .container {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    /* Tighten link spacing and allow graceful wrapping */
+    .site-header nav {
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .site-header nav a {
+        font-size: 0.85rem;
+    }
+}
+
 /* ======================
     Styling landing page
    ====================== */
