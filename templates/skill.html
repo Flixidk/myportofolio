@@ -26,7 +26,39 @@
 
     <main>
         <!-- Main Skills Section -->
-        
+        <section class="skill-section" id="skill">
+            <div class="container">
+                <h2>Skills & Tech Stack</h2>
+
+                <div class="bento-grid">
+                    {% for skill in skills_list %}
+                        <div class="bento-card">
+                            <div class="card-header">
+                                <img 
+                                    src="{{ skill.icon_path }}" 
+                                    alt="{{ skill.title }} logo" 
+                                    class="skill-icon-svg"
+                                />
+                            </div>
+                            <div class="card-body">
+                                <h3>{{ skill.title }}</h3>
+                                {% if skill.description %}
+                                    <p>{{ skill.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    {% empty %}
+                        <div class="empty-skill-state">
+                            <div class="empty-skill-icon">📦</div>
+                            <h3>No Skills Found</h3>
+                            <p>Add skills from Django Admin Dashboard</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </section>
     </main>
 
     <footer class="site-footer">
