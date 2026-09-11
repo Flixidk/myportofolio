@@ -42,11 +42,11 @@ class Skill(models.Model):
         editable=False
         )
     title = models.CharField(max_length=255)
-    description = models.TextField()
-    icon_class = models.CharField(
+    description = models.TextField(blank=True, null=True)
+    icon_path = models.CharField(
         max_length=100, 
         blank=True, 
-        help_text = "icon (font version) from devicon.dev")
+        help_text = "icon (svg link) from devicon.dev")
     order = models.PositiveIntegerField(
         default=0, 
         help_text="Lower numbers display first"
