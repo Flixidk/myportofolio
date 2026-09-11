@@ -1,3 +1,7 @@
+/* ===========================
+    Styling across all pages
+   =========================== */
+
 * {
     margin: 0;
     padding: 0;
@@ -60,6 +64,35 @@ h1, .brand {
     text-decoration: none;
     font-size: 0.95rem;
 }
+
+.site-footer {
+    padding: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--line);
+}
+
+@media (max-width: 600px) {
+    .site-header .container {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    .site-header nav {
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .site-header nav a {
+        font-size: 0.85rem;
+    }
+}
+
+/* ======================
+    Styling landing page
+   ====================== */
 
 .hero {
     padding: 4.5rem 0 5rem;
@@ -171,7 +204,7 @@ h1, .brand {
 }
 
 .education-section h2 {
-    font-family: "Space Grotesk", -apple-system, sans-serif;
+    font-family: "Space Mono", monospace;
     font-size: 2.5rem; 
     color: var(--ink);
     text-align: center; 
@@ -291,82 +324,84 @@ h1, .brand {
     color: var(--accent-dark); 
 }
 
-.site-footer {
-    padding: 1.5rem;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    border-top: 1px solid var(--line);
+/* ===================================
+   Styling for landing page animation
+   =================================== */
+
+/* Set keyframes for each animation */   
+@keyframes drawLine {
+    from { height: 0; }
+    to { height: 100%; }
 }
 
-.experience-section {
-    padding: 4rem 0;
-    border-top: 1px solid var(--line);
+@keyframes popNode {
+    from { opacity: 0; transform: translateX(-50%) scale(0); }
+    to { opacity: 1; transform: translateX(-50%) scale(1); }
 }
 
-.section-kicker {
-    color: var(--accent-dark);
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-40px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
-.experience-section h1 {
-    margin: 0.4rem 0 1.5rem;
-    font-size: 2rem;
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
-.experience-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1rem;
+/* Set initial positions, opacity and animation types for each element in timeline */
+.timeline-node, .timeline-content, .timeline-date {
+    opacity: 0; 
 }
 
-.experience-card {
-    padding: 1.25rem;
-    background-color: #fff;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
+.is-visible .education-timeline::before {
+    animation: drawLine 2s linear forwards;
 }
 
-.experience-category {
-    color: var(--accent-dark);
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
+.is-visible .timeline-node {
+    animation: popNode 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-.experience-card h2 {
-    margin: 0.5rem 0;
-    font-size: 1.25rem;
-}
+.is-visible .timeline-item:nth-child(odd) .timeline-content { animation: slideInLeft 0.6s ease-out forwards; }
+.is-visible .timeline-item:nth-child(odd) .timeline-date { animation: slideInRight 0.6s ease-out forwards; }
 
-.experience-description, .empty-state {
-    color: var(--text-muted);
-}
+.is-visible .timeline-item:nth-child(even) .timeline-content { animation: slideInRight 0.6s ease-out forwards; }
+.is-visible .timeline-item:nth-child(even) .timeline-date { animation: slideInLeft 0.6s ease-out forwards; }
 
-.experience-status {
-    margin-top: 1rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
+/* Set delay for each timeline item */
+.is-visible .timeline-item:nth-child(1) .timeline-node { animation-delay: 0.3s; }
+.is-visible .timeline-item:nth-child(1) .timeline-content,
+.is-visible .timeline-item:nth-child(1) .timeline-date { animation-delay: 0.5s; }
 
-/* Additional responsive settings for mobile view */
+.is-visible .timeline-item:nth-child(2) .timeline-node { animation-delay: 1.0s; }
+.is-visible .timeline-item:nth-child(2) .timeline-content,
+.is-visible .timeline-item:nth-child(2) .timeline-date { animation-delay: 1.2s; }
+
+.is-visible .timeline-item:nth-child(3) .timeline-node { animation-delay: 1.7s; }
+.is-visible .timeline-item:nth-child(3) .timeline-content,
+.is-visible .timeline-item:nth-child(3) .timeline-date { animation-delay: 1.9s; }
+
 @media (max-width: 600px) {
     .hero-grid {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-            "identity"
-            "photo"
-            "details";
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
     }
 
     .hero-photo {
         max-width: 220px;
+        margin: 0 auto;
     }
 
-    .social-links {
-        justify-content: flex-start;
+    .bio {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .meta-list, .social-links {
+        justify-content: center;
     }
 
     .education-timeline::before {
@@ -403,59 +438,259 @@ h1, .brand {
     }
 }
 
-/* ====================== 
-   Styling for animations 
-   ====================== */
+/* =============================
+    Styling for Experience page
+   ============================= */
 
-/* Set keyframes for each animation */   
-@keyframes drawLine {
-    from { height: 0; }
-    to { height: 100%; }
+.experience-section h2 {
+    font-family: "Space Mono", monospace;
+    font-size: 2.5rem; 
+    color: var(--ink);
+    text-align: center; 
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    position: relative;
 }
 
-@keyframes popNode {
-    from { opacity: 0; transform: translateX(-50%) scale(0); }
-    to { opacity: 1; transform: translateX(-50%) scale(1); }
+.metro-map {
+  position: relative;
+  padding-left: 40px; 
 }
 
-@keyframes slideInLeft {
-    from { opacity: 0; transform: translateX(-40px); }
-    to { opacity: 1; transform: translateX(0); }
+.metro-station {
+  position: relative;
+  margin-top: 3rem;
+  margin-bottom: 3rem;
 }
 
-@keyframes slideInRight {
-    from { opacity: 0; transform: translateX(40px); }
-    to { opacity: 1; transform: translateX(0); }
+.node {
+  position: absolute;
+  left: -40px;
+  top: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 4px solid var(--line-color, #888);
+  z-index: 2;
 }
 
-/* Set initial positions, opacity and animation types for each element in timeline */
-.timeline-node, .timeline-content, .timeline-date {
-    opacity: 0; 
+.metro-station:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: -32px; 
+  top: 24px;
+  width: 4px;
+  height: calc(100% + 2rem);
+  background-color: var(--line-color, #888);
+  z-index: 1;
 }
 
-.is-visible .education-timeline::before {
-    animation: drawLine 2s linear forwards;
+.station-card {
+  background-color: #ffffff;   
+  border-radius: 10px;          
+  padding: 1.25rem 1.5rem;       
+  border: 1px solid #e2e8f0;     
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); 
+  max-width: 550px;              
+  margin-left: 1rem; 
+  transition: transform 0.2s ease, box-shadow 0.2s ease;            
 }
 
-.is-visible .timeline-node {
-    animation: popNode 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+.station-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-.is-visible .timeline-item:nth-child(odd) .timeline-content { animation: slideInLeft 0.6s ease-out forwards; }
-.is-visible .timeline-item:nth-child(odd) .timeline-date { animation: slideInRight 0.6s ease-out forwards; }
 
-.is-visible .timeline-item:nth-child(even) .timeline-content { animation: slideInRight 0.6s ease-out forwards; }
-.is-visible .timeline-item:nth-child(even) .timeline-date { animation: slideInLeft 0.6s ease-out forwards; }
+.year-2023 { --line-color: #6366f1; } 
+.year-2024 { --line-color: #f782c2 ; } 
+.year-2025 { --line-color: #10b981; } 
+.year-2026 { --line-color: #8D90E2 ; } 
 
-/* Set delay for each timeline item */
-.is-visible .timeline-item:nth-child(1) .timeline-node { animation-delay: 0.3s; }
-.is-visible .timeline-item:nth-child(1) .timeline-content,
-.is-visible .timeline-item:nth-child(1) .timeline-date { animation-delay: 0.5s; }
+.metro-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  background-color: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  color: #64748b;
+  margin-left: -20px; 
+}
 
-.is-visible .timeline-item:nth-child(2) .timeline-node { animation-delay: 1.0s; }
-.is-visible .timeline-item:nth-child(2) .timeline-content,
-.is-visible .timeline-item:nth-child(2) .timeline-date { animation-delay: 1.2s; }
+.empty-station-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.8;
+}
 
-.is-visible .timeline-item:nth-child(3) .timeline-node { animation-delay: 1.7s; }
-.is-visible .timeline-item:nth-child(3) .timeline-content,
-.is-visible .timeline-item:nth-child(3) .timeline-date { animation-delay: 1.9s; }
+.metro-empty-state h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.metro-empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
+  max-width: 320px;
+}
+
+/* ===========================
+    Styling for Skill page
+   =========================== */
+.skill-section h2 {
+    font-family: "Space Mono", monospace;
+    font-size: 2.5rem; 
+    color: var(--ink);
+    text-align: center; 
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-auto-flow: dense; 
+    gap: 1rem;
+    margin-bottom: 4rem;
+}
+
+.bento-card {
+    background-color: #ffffff;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius);
+    padding: 1rem;
+    box-shadow: 4px 4px 0px var(--line);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bento-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 6px 6px 0px var(--ink);
+}
+
+.bento-card img,
+.skill-icon-svg {
+    width: 44px !important;      
+    height: 44px !important;      
+    max-width: 44px;
+    object-fit: contain;          
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+
+.bento-card h3 {
+    font-family: "Space Mono", monospace;
+    font-size: 1.05rem;
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+}
+
+.bento-card p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+/* =====================================
+   Automatic Repeating Pattern (7-cycle)
+   ===================================== */
+
+.bento-card:nth-child(7n + 1) {
+    grid-column: span 2;
+    grid-row: span 2;
+    background-color: var(--paper);
+    border: 2px solid var(--ink);
+}
+
+.bento-card:nth-child(7n + 1) .card-header {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 0;
+}
+
+.bento-card:nth-child(7n + 1) img,
+.bento-card:nth-child(7n + 1) .skill-icon-svg {
+    width: 150px !important;
+    height: 150px !important;
+    max-width: 150px;
+}
+
+.bento-card:nth-child(7n + 4) {
+    grid-column: span 2;
+}
+
+.empty-skill-state {
+    grid-column: 1 / -1; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    background-color: #ffffff;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: 4px 4px 0px var(--line);
+}
+
+.empty-skill-state .empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.empty-skill-state h3 {
+    font-family: "Space Mono", monospace;
+    font-size: 1.25rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+}
+
+.empty-skill-state p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    max-width: 360px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    .container, 
+    .skill-section {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+
+    .bento-grid {
+        width: 100%;
+        grid-template-columns: 1fr;
+    }
+
+    .bento-card:nth-child(7n + 1),
+    .bento-card:nth-child(7n + 4) {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+}
 

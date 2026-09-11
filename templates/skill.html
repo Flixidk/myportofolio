@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nanta - Experience</title>
+    <title>Nanta - Skills</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" type='text/css' href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
+          
 </head>
 <body>
     <header class="site-header">
@@ -23,36 +25,39 @@
     </header>
 
     <main>
-        <!-- Main Experience Section -->
-        <section class="experience-section" id="experience">
+        <!-- Main Skills Section -->
+        <section class="skill-section" id="skill">
             <div class="container">
-                <h2>My Experience</h2>
+                <h2>Skills & Tech Stack</h2>
 
-                <div class="metro-map">
-                    {% for exp in experience_list %}
-                        <div class="metro-station year-{{ exp.started_at|date:'Y' }} {% if exp.is_ongoing %}active-station{% endif %}">
-                
-                            <!-- Station Stop (Node on the line) -->
-                            <div class="node"></div>
-                            <!-- Station Info Card -->
-                            <div class="station-card">
-                                <span class="route-badge">{{ exp.get_category_display }}</span>
-                                <h3>{{ exp.title }}</h3>
-                                <time>{{ exp.ended_at|date:"Y" }}</time>
-                                <p>{{ exp.description }}</p>
+                <div class="bento-grid">
+                    {% for skill in skills_list %}
+                        <div class="bento-card">
+                            <div class="card-header">
+                                <img 
+                                    src="{{ skill.icon_path }}" 
+                                    alt="{{ skill.title }} logo" 
+                                    class="skill-icon-svg"
+                                />
+                            </div>
+                            <div class="card-body">
+                                <h3>{{ skill.title }}</h3>
+                                {% if skill.description %}
+                                    <p>{{ skill.description }}</p>
+                                {% endif %}
                             </div>
                         </div>
 
                     {% empty %}
-                    <!-- Metro-themed Empty State -->
-                    <div class="metro-empty-state">
-                        <div class="empty-station-icon">🚧</div>
-                        <h3>Line Under Construction</h3>
-                        <p>No stations built yet. Check back soon for upcoming stops on this route!</p>
-                    </div>
+                        <div class="empty-skill-state">
+                            <div class="empty-skill-icon">📦</div>
+                            <h3>No Skills Found</h3>
+                            <p>Add skills from Django Admin Dashboard</p>
+                        </div>
                     {% endfor %}
                 </div>
             </div>
+
         </section>
     </main>
 
