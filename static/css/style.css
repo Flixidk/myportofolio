@@ -381,22 +381,27 @@ h1, .brand {
 .is-visible .timeline-item:nth-child(3) .timeline-content,
 .is-visible .timeline-item:nth-child(3) .timeline-date { animation-delay: 1.9s; }
 
-/* Additional responsive settings for mobile view landing page */
 @media (max-width: 600px) {
     .hero-grid {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-            "identity"
-            "photo"
-            "details";
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
     }
 
     .hero-photo {
         max-width: 220px;
+        margin: 0 auto;
     }
 
-    .social-links {
-        justify-content: flex-start;
+    .bio {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .meta-list, .social-links {
+        justify-content: center;
     }
 
     .education-timeline::before {
@@ -488,11 +493,8 @@ h1, .brand {
   border: 1px solid #e2e8f0;     
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); 
   max-width: 550px;              
-  margin-left: 1rem;             
-}
-
-.station-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-left: 1rem; 
+  transition: transform 0.2s ease, box-shadow 0.2s ease;            
 }
 
 .station-card:hover {
@@ -576,37 +578,6 @@ h1, .brand {
     box-shadow: 6px 6px 0px var(--ink);
 }
 
-/* =====================================
-   Automatic Repeating Pattern (7-cycle)
-   ===================================== */
-
-.bento-card:nth-child(7n + 1) {
-    grid-column: span 2;
-    grid-row: span 2;
-    background-color: var(--paper);
-    border: 2px solid var(--ink);
-    justify-content: space-between;
-}
-
-.bento-card:nth-child(7n + 1) .card-header {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem 0;
-}
-
-.bento-card:nth-child(7n + 1) img,
-.bento-card:nth-child(7n + 1) .skill-icon-svg {
-    width: 150px !important;
-    height: 150px !important;
-    max-width: 150px;
-}
-
-.bento-card:nth-child(7n + 4) {
-    grid-column: span 2;
-}
-
 .bento-card img,
 .skill-icon-svg {
     width: 44px !important;      
@@ -638,6 +609,36 @@ h1, .brand {
     line-height: 1.4;
     overflow-wrap: break-word;
     word-break: break-word;
+}
+
+/* =====================================
+   Automatic Repeating Pattern (7-cycle)
+   ===================================== */
+
+.bento-card:nth-child(7n + 1) {
+    grid-column: span 2;
+    grid-row: span 2;
+    background-color: var(--paper);
+    border: 2px solid var(--ink);
+}
+
+.bento-card:nth-child(7n + 1) .card-header {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 0;
+}
+
+.bento-card:nth-child(7n + 1) img,
+.bento-card:nth-child(7n + 1) .skill-icon-svg {
+    width: 150px !important;
+    height: 150px !important;
+    max-width: 150px;
+}
+
+.bento-card:nth-child(7n + 4) {
+    grid-column: span 2;
 }
 
 .empty-skill-state {
@@ -676,15 +677,13 @@ h1, .brand {
 
 @media (max-width: 600px) {
     .container, 
-    .skills-section {
+    .skill-section {
         padding-left: 1.25rem;
         padding-right: 1.25rem;
-        box-sizing: border-box;
     }
 
     .bento-grid {
         width: 100%;
-        box-sizing: border-box;
         grid-template-columns: 1fr;
     }
 
