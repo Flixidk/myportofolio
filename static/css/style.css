@@ -636,6 +636,8 @@ h1, .brand {
     font-size: 0.9rem;
     color: var(--text-muted);
     line-height: 1.4;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .empty-skill-state {
@@ -673,7 +675,16 @@ h1, .brand {
 }
 
 @media (max-width: 600px) {
+    .container, 
+    .skills-section {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        box-sizing: border-box;
+    }
+
     .bento-grid {
+        width: 100%;
+        box-sizing: border-box;
         grid-template-columns: 1fr;
     }
 
