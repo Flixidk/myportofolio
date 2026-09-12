@@ -36,21 +36,33 @@ class Experience(models.Model):
         return self.ended_at is None
 
 class Skill(models.Model):
+    CATEGORY_CHOICES = [
+        ('frontend', 'Frontend'),
+        ('backend', 'Backend'),
+        ('database', 'Database'),
+        ('tools', 'Dev Tools'),
+    ]
+
     id = models.UUIDField(
         primary_key=True, 
         default=uuid.uuid4, 
         editable=False
         )
     title = models.CharField(max_length=255)
+    category = models.CharField(
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        default='tools'
+        )   
     description = models.TextField(blank=True, null=True)
     icon_path = models.CharField(
         max_length=100, 
         blank=True, 
-        help_text = "icon (svg link) from devicon.dev")
+        help_text ="icon (svg link) from devicon.dev")
     order = models.PositiveIntegerField(
         default=0, 
         help_text="Lower numbers display first"
-    )
+        )
 
     class Meta:
         ordering = ['order', 'title']

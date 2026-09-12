@@ -553,6 +553,38 @@ h1, .brand {
     position: relative;
 }
 
+/* ===========================
+    Category Filter Navigation
+   =========================== */
+
+.category-filters {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.filter-pill {
+    font-family: "Space Mono", monospace;
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: var(--ink);
+    background-color: #ffffff;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius);
+    padding: 0.4rem 0.9rem;
+    box-shadow: 2px 2px 0px var(--ink);
+    transition: all 0.15s ease;
+}
+
+.filter-pill:hover,
+.filter-pill.active {
+    background-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 0px var(--ink);
+}
+
 .bento-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
