@@ -24,8 +24,26 @@ def show_experience(request):
     return render(request, "experience.html", context)
 
 def show_skill(request):
+    selected_category = request.GET.get('cat', 'all')
+
+    # Filter based on category
+    if selected_category and selected_category != 'all':
+        skills_list = Skill.objects.filter(category=selected_category)
+    else:
+        skills_list = Skill.objects.all()
+
+    categories = [
+        ('all', 'All'),
+        ('frontend', 'Frontend'),
+        ('backend', 'Backend'),
+        ('database', 'Database'),
+        ('tools', 'Dev Tools'),
+    ]
+
     context = {
         "name" : "Nanta",
-        "skills_list" : Skill.objects.all(),
+        "skills_list" : skills_list,
+        "categories" : categories,
+        'selected_category' : selected_category,
     }
     return render(request, "skill.html", context)

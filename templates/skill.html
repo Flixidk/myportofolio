@@ -30,6 +30,15 @@
             <div class="container">
                 <h2>Skills & Tech Stack</h2>
 
+                <div class="category-filters">
+                    {% for slug, label in categories %}
+                        <a href="?cat={{ slug }}" 
+                        class="filter-pill {% if selected_category == slug %}active{% endif %}">
+                            {{ label }}
+                        </a>
+                    {% endfor %}
+                </div>
+                
                 <div class="bento-grid">
                     {% for skill in skills_list %}
                         <div class="bento-card">
