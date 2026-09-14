@@ -1,27 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nanta - Portfolio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <header class="site-header">
-        <div class="container">
-            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
-            <nav>
-                <a href="{% url 'main:show_main' %}">Profile</a>
-                <a href="{% url 'main:show_main' %}#education">Education</a>
-                <a href="{% url 'main:show_experience' %}">Experience</a>
-                <a href="{% url 'main:show_skill' %}">Skills</a>
-            </nav>
-        </div>
-    </header>
+{% extends 'base.html' %}
+{% load static %}
 
+
+{% block content %}
     <main>
         <!-- Main Hero Section -->
         <section class="hero" id="profile">
@@ -32,7 +13,7 @@
                 </div>
                 <div class="hero-photo">
                     <div class="photo-block"></div>
-                    <img class="avatar" src="/static/img/fotonanta.jpeg" alt="Photo of {{ name }}">
+                    <img class="avatar" src="{% static 'img/fotonanta.jpeg' %}" alt="Photo of {{ name }}">
                 </div>
                 <div class="hero-details">
                     <p class="bio"> {{ bio }}</p>
@@ -68,7 +49,7 @@
 
                         <div class="timeline-content">
                             <div class="school-header">
-                                <img src="static\img\smabel-logo.png" alt="SMPN 115 Logo" class="school-logo" style="transform: scale(1.5);">
+                                <img src="{% static 'img\smabel-logo.png' %}" alt="SMPN 115 Logo" class="school-logo" style="transform: scale(1.5);">
                                 <h3>SMP Negeri 115 Jakarta</h3>
                             </div>
                         </div>
@@ -79,7 +60,7 @@
                         <div class="timeline-date">2022 &mdash; 2025</div>
                         <div class="timeline-content">
                             <div class="school-header">
-                                <img src="static\img\jusat-logo.png" alt="SMAN 71 Logo" class="school-logo">
+                                <img src="{% static 'img\jusat-logo.png' %}" alt="SMAN 71 Logo" class="school-logo">
                                 <h3>SMA Negeri 71 Jakarta</h3>
                             </div>
                             <ul>
@@ -95,7 +76,7 @@
 
                         <div class="timeline-content">
                             <div class="school-header">
-                                <img src="static\img\ui-logo.png" alt="UI Logo" class="school-logo">
+                                <img src="{% static 'img\ui-logo.png' %}" alt="UI Logo" class="school-logo">
                                 <h3>Computer Science - Universitas Indonesia</h3>
                             </div>
                             <ul>
@@ -108,13 +89,9 @@
             </div>
         </section>
     </main>
+{% endblock content %}
 
-    <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
-        </div>
-    </footer>
-
+{% block script %}
     <!--Script for Timeline Animation-->
     <script>
         // Set dynamic threshold value for screen scrolling in desktop/mobile view
@@ -138,5 +115,4 @@
             observer.observe(educationSection);
         }
     </script>
-</body>
-</html>
+{% endblock script %}
