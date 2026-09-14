@@ -28,6 +28,7 @@ class Experience(models.Model):
         )
     started_at = models.DateTimeField()
     ended_at = models.DateTimeField(blank=True, null=True)
+    
     def __str__(self):
         return self.title   
     

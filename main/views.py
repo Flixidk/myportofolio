@@ -1,8 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.core import serializers
+from django.http import HttpResponse
 
-# Create your views here.
 from main.models import Experience
 from main.models import Skill
+from .forms import ExperienceForm
 
 def show_main(request):
     context = {
@@ -22,6 +25,20 @@ def show_experience(request):
         "experience_list": Experience.objects.all(),
     }
     return render(request, "experience.html", context)
+
+def create_experience(request):
+    form = ExperienceForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Pengalaman baru berhasil ditambahkan!")
+        return redirect("main:show_experience")
+
+    context = {
+        "name": "Nanta",
+        "form": form,
+    }
+    return render(request, "experience_form.html", context)
 
 def show_skill(request):
     selected_category = request.GET.get('cat', 'all')
