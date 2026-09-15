@@ -20,9 +20,19 @@ def show_main(request):
     return render(request, "index.html", context)
 
 def show_experience(request):
+    json_response = get_experience_json(request)
+
+    experience_data = serializers.deserialize(
+        "json",
+        json_response.content.decode("utf-8"),
+    )
+    experience_list = [experience.object for experience in experience_data]
+    title_query = request.GET.get("title", "").strip()
+
     context = {
         "name": "Nanta",
         "experience_list": Experience.objects.all(),
+        "title_query" : title_query,
     }
     return render(request, "experience.html", context)
 
@@ -39,6 +49,16 @@ def create_experience(request):
         "form": form,
     }
     return render(request, "experience_form.html", context)
+
+def get_experience_json(request):
+    title_query = request.GET.get("title", "").strip()
+    experience_list = Experience.objects.all()
+
+    if title_query:
+        experience_list = experience_list.filter(title__icontains=title_query)
+
+    experience_json = serializers.serialize("json", experience_list)
+    return HttpResponse(experience_json, content_type="application/json")
 
 def show_skill(request):
     selected_category = request.GET.get('cat', 'all')
