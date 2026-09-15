@@ -26,8 +26,9 @@ class Experience(models.Model):
         choices=EXPERIENCE_CHOICES, 
         default='full-time'
         )
-    started_at = models.DateTimeField()
-    ended_at = models.DateTimeField(blank=True, null=True)
+    started_at = models.DateField(blank=True, null=True,)
+    ended_at = models.DateField()
+    
     def __str__(self):
         return self.title   
     
