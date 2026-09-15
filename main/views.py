@@ -31,7 +31,7 @@ def show_experience(request):
 
     context = {
         "name": "Nanta",
-        "experience_list": Experience.objects.all(),
+        "experience_list": experience_list,
         "title_query" : title_query,
     }
     return render(request, "experience.html", context)
@@ -59,6 +59,16 @@ def get_experience_json(request):
 
     experience_json = serializers.serialize("json", experience_list)
     return HttpResponse(experience_json, content_type="application/json")
+
+def delete_experience(request, experience_id):
+    experience = get_object_or_404(Experience, pk=experience_id)
+
+    if request.method == "POST":
+        experience.delete()
+        messages.success(request, "Pengalaman berhasil dihapus!")
+        return redirect("main:show_experience")
+
+    return redirect("main:show_experience")
 
 def show_skill(request):
     selected_category = request.GET.get('cat', 'all')

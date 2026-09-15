@@ -9,6 +9,26 @@
             <div class="container">
                 <h2>My Experience</h2>
 
+                <div class="experience-actions">
+                    <form method="get"
+                        action="{% url 'main:show_experience' %}"
+                        class="experience-search">
+                        <input type="search"
+                            name="title"
+                            value="{{ title_query }}"
+                            placeholder="Cari berdasarkan nama pengalaman"
+                            class="experience-search__input"
+                            aria-label="Cari berdasarkan nama pengalaman">
+                        <button type="submit" class="button">Cari</button>
+                    </form>
+
+                    <a href="{% url 'main:create_experience' %}"
+                        class="button project-add-button">
+                            <span aria-hidden="true">+</span>
+                            Tambah Pengalaman
+                    </a>
+                </div>
+
                 <div class="metro-map">
                     {% for exp in experience_list %}
                         <div class="metro-station year-{{ exp.started_at|date:'Y' }} {% if exp.is_ongoing %}active-station{% endif %}">
@@ -21,6 +41,9 @@
                                 <h3>{{ exp.title }}</h3>
                                 <time>{{ exp.ended_at|date:"Y" }}</time>
                                 <p>{{ exp.description }}</p>
+                                <div class="project-actions">
+                                    {% include "components/experience_delete_modal.html" with experience=exp %}
+                                </div>
                             </div>
                         </div>
 
@@ -36,11 +59,4 @@
             </div>
         </section>
     </main>
-
-    <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
-        </div>
-    </footer>
-</body>
 {% endblock content %}
