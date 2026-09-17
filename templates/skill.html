@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-
 {% block content %}
     <main>
         <!-- Main Skills Section -->
@@ -21,6 +20,8 @@
                 <div class="bento-grid">
                     {% for skill in skills_list %}
                         <div class="bento-card">
+                            {% include "components/skill_delete_modal.html" with skill=skill %}
+
                             <div class="card-header">
                                 <img 
                                     src="{{ skill.icon_path }}" 
