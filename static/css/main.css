@@ -1,0 +1,286 @@
+@import url(landing_page.css);
+@import url(experience.css);
+@import url(skill.css);
+
+
+/* ===========================
+    Styling across all pages
+   =========================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --ink: #1c1917;
+    --paper: #FFF5F5;
+    --accent: #F7D6D0;
+    --accent-dark: #722F99;
+    --line: #e3d9c9;
+    --text-muted: #4A4A4A;
+    --radius: 4px;
+}
+
+body {
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background-color: var(--paper);
+    line-height: 1.6;
+}
+
+h1, .brand {
+    font-family: "Space Mono", monospace;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.site-header {
+    border-bottom: 1px solid var(--line);
+}
+
+.site-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+}
+
+.brand {
+    font-size: 1.3rem;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.site-header nav {
+    display: flex;
+    gap: 2rem;
+}
+
+.site-header nav a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.site-footer {
+    padding: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--line);
+}
+
+@media (max-width: 600px) {
+    .site-header .container {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    .site-header nav {
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .site-header nav a {
+        font-size: 0.85rem;
+    }
+}
+
+/* =========================
+    Generic Buttons Styling
+   ======================== */
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: fit-content;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius);
+    padding: 0.65rem 1rem;
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 2px 2px 0px var(--accent);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 0px var(--accent-dark);
+}
+
+.button-secondary {
+    background: var(--paper);
+    color: var(--ink);
+}
+
+.button-danger {
+    background: #b42318;
+    color: white;
+}
+
+/* ==================================
+    Styling for Generic Delete Modals
+   ================================== */
+.delete-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 1rem;
+    border: 0;
+    background: transparent;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-modal:popover-open {
+    display: flex;
+}
+
+.delete-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    padding: 0;
+    background: rgba(28, 25, 23, 0.58);
+    cursor: default;
+}
+
+.delete-modal__content {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 480px);
+    padding: 1.5rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 1rem 3rem rgba(28, 25, 23, 0.22);
+}
+
+.delete-modal__content h2 {
+    margin: 0 0 0.75rem;
+    font-family:
+        "Space Grotesk",
+        -apple-system,
+        sans-serif;
+    font-size: 1.5rem;
+}
+
+.delete-modal__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.delete-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+@media (max-width:600px) {
+    .delete-modal {
+        align-items: center;
+        padding: 0;
+    }
+
+    .delete-modal__content {
+        width: 100%;
+        padding: 1.25rem;
+        border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .delete-modal__actions {
+        flex-direction: column-reverse;
+    }
+
+    .delete-modal__actions .button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ====================
+    Styling for Forms
+   ==================== */
+
+.form-status {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.7rem;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    font: inherit;
+    transition:
+        border-color 0.2s ease,
+        outline-color 0.2s ease;
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: 2px solid var(--accent);
+    border-color: var(--accent);
+}
+
+.form-error {
+    color: #b42318;
+    font-size: 0.85rem;
+    margin-top: 0.35rem;
+}

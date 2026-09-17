@@ -1,0 +1,224 @@
+/* ===========================
+    Styling for Skill page
+   =========================== */
+.skill-section h2 {
+    font-family: "Space Mono", monospace;
+    font-size: 2.5rem; 
+    color: var(--ink);
+    text-align: center; 
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+/* ===========================
+    Category Filter Navigation
+   =========================== */
+
+.category-filters {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.filter-pill {
+    font-family: "Space Mono", monospace;
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: var(--ink);
+    background-color: #ffffff;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius);
+    padding: 0.4rem 0.9rem;
+    box-shadow: 2px 2px 0px var(--ink);
+    transition: all 0.15s ease;
+}
+
+.filter-pill:hover,
+.filter-pill.active {
+    background-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 3px 3px 0px var(--ink);
+}
+
+.create-skill-pill {
+    background-color: var(--accent-dark);
+    color: var(--paper)
+}
+
+.create-skill-pill:hover {
+    background-color: var(--accent);
+    color: var(--ink)
+}
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-auto-flow: dense; 
+    gap: 1rem;
+    margin-bottom: 4rem;
+}
+
+.bento-card {
+    position: relative;
+    background-color: #ffffff;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius);
+    padding: 1rem;
+    box-shadow: 4px 4px 0px var(--line);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bento-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 6px 6px 0px var(--ink);
+}
+
+/* Small X Button */
+.bento-card__delete {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    z-index: 2;
+}
+
+.bento-card__delete:hover {
+    color: #b42318;
+    background-color: var(--accent);
+    border-color: var(--ink);
+}
+
+.bento-card img,
+.skill-icon-svg {
+    width: 44px !important;      
+    height: 44px !important;      
+    max-width: 44px;
+    object-fit: contain;          
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+
+.bento-card h3 {
+    font-family: "Space Mono", monospace;
+    font-size: 1.05rem;
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+}
+
+.bento-card p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+/* =====================================
+   Automatic Repeating Pattern (7-cycle)
+   ===================================== */
+
+.bento-card:nth-child(7n + 1) {
+    grid-column: span 2;
+    grid-row: span 2;
+    background-color: var(--paper);
+    border: 2px solid var(--ink);
+}
+
+.bento-card:nth-child(7n + 1) .card-header {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 0;
+}
+
+.bento-card:nth-child(7n + 1) img,
+.bento-card:nth-child(7n + 1) .skill-icon-svg {
+    width: 150px !important;
+    height: 150px !important;
+    max-width: 150px;
+}
+
+.bento-card:nth-child(7n + 4) {
+    grid-column: span 2;
+}
+
+.empty-skill-state {
+    grid-column: 1 / -1; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    background-color: #ffffff;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: 4px 4px 0px var(--line);
+}
+
+.empty-skill-state .empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.empty-skill-state h3 {
+    font-family: "Space Mono", monospace;
+    font-size: 1.25rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+}
+
+.empty-skill-state p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    max-width: 360px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    .container, 
+    .skill-section {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+
+    .bento-grid {
+        width: 100%;
+        grid-template-columns: 1fr;
+    }
+
+    .bento-card:nth-child(7n + 1),
+    .bento-card:nth-child(7n + 4) {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+}
+
