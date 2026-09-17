@@ -41,8 +41,12 @@
                                 <h3>{{ exp.title }}</h3>
                                 <time>{{ exp.ended_at|date:"Y" }}</time>
                                 <p>{{ exp.description }}</p>
-                                <div class="project-actions">
+                                <div class="experience-actions">
                                     {% include "components/experience_delete_modal.html" with experience=exp %}
+
+                                    <a href="{% url 'main:edit_experience' exp.id %}" class="button button-secondary">
+                                        Edit
+                                    </a>
                                 </div>
                             </div>
                         </div>

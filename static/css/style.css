@@ -230,6 +230,7 @@ h1, .brand {
 
 .form-status {
     margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .form {
@@ -644,9 +645,8 @@ h1, .brand {
 .experience-actions {
     display: flex;
     align-items: center;
+    margin-top: 0.5rem;
     gap: 0.75rem;
-    margin-top: 2.5rem;    
-    margin-bottom: 3rem;
     width: 100%;
     max-width: 750px;   
 }
@@ -725,6 +725,10 @@ h1, .brand {
 .year-2024 { --line-color: #f782c2 ; } 
 .year-2025 { --line-color: #10b981; } 
 .year-2026 { --line-color: #8D90E2 ; } 
+
+.experience-actions{
+    margin-top: 1.25rem;
+}
 
 .metro-empty-state {
   display: flex;
@@ -838,6 +842,16 @@ h1, .brand {
     background-color: var(--accent);
     transform: translateY(-2px);
     box-shadow: 3px 3px 0px var(--ink);
+}
+
+.create-skill-pill {
+    background-color: var(--accent-dark);
+    color: var(--paper)
+}
+
+.create-skill-pill:hover {
+    background-color: var(--accent);
+    color: var(--ink)
 }
 
 .bento-grid {
