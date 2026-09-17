@@ -111,3 +111,13 @@ def create_skill(request):
         "form": form,
     }
     return render(request, "skill_form.html", context)
+
+def get_skill_json(request):
+    title_query = request.GET.get("title", "").strip()
+    skill_list = Skill.objects.all()
+
+    if title_query:
+        skill_list = skill_list.filter(title__icontains=title_query)
+
+    skill_json = serializers.serialize("json", skill_list)
+    return HttpResponse(skill_json, content_type="application/json")
