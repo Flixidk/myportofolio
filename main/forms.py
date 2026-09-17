@@ -1,6 +1,6 @@
-from django.forms import ModelForm, TextInput, Textarea, URLInput, DateInput, Select
+from django.forms import ModelForm, TextInput, Textarea, URLInput, DateInput, Select, NumberInput
 
-from main.models import Experience
+from main.models import Experience, Skill
 
 EXPERIENCE_CHOICES = [
     ('internship', 'Internship'),
@@ -57,3 +57,59 @@ class ExperienceForm(ModelForm):
                 }
             ),
         }
+
+SKILL_CATEGORY_CHOICES = [
+        ('frontend', 'Frontend'),
+        ('backend', 'Backend'),
+        ('database', 'Database'),
+        ('tools', 'Dev Tools'),
+    ]
+
+class SkillForm(ModelForm):
+    class Meta:
+        model = Skill
+        fields = [
+            "title",
+            "category",
+            "description",
+            "icon_path",
+            "order",
+        ]
+
+        labels = {
+            "title" : "Nama Skill",
+            "category" : "Kategori",
+            "description" : "Deskripsi Skill",
+            "icon_path" : "Devicon Path",
+            "order" : "Urutan",
+        }
+
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "Java",
+                    "maxlength": 255,
+                }
+            ),
+            "category": Select(
+                            choices=SKILL_CATEGORY_CHOICES,
+                        ),
+            "description": TextInput(
+                attrs={
+                    "placeholder": "Ceritakan Pengalamanmu",
+                    "maxlength" : 255,
+                }
+            ),
+            "icon_path" : URLInput(
+                attrs={
+                    "placeholder": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/...",
+                    "maxlength" : 255,
+                }
+            ),
+            "order" : NumberInput(
+                attrs={
+                    "placeholder" : "Input Ordering Number",
+                }
+            )   
+        }
+
