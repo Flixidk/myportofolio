@@ -5,8 +5,11 @@ from django.http import HttpResponse
 
 from main.models import Experience
 from main.models import Skill
-from .forms import ExperienceForm
+from .forms import ExperienceForm, SkillForm
 
+''' ===============================
+    Functions for Main Landing Page
+    =============================== '''
 def show_main(request):
     context = {
         "name": "Nanta",
@@ -19,6 +22,9 @@ def show_main(request):
     }
     return render(request, "index.html", context)
 
+''' =============================
+    Functions for Experience Page
+    ============================= '''
 def show_experience(request):
     json_response = get_experience_json(request)
 
@@ -70,14 +76,23 @@ def delete_experience(request, experience_id):
 
     return redirect("main:show_experience")
 
+''' =========================
+    Functions for Skill Page
+    ========================= '''
 def show_skill(request):
     selected_category = request.GET.get('cat', 'all')
 
-    # Filter based on category
+    # Fetch and deserialize JSON data
+    json_response = get_skill_json(request)
+    skill_data = serializers.deserialize(
+        "json",
+        json_response.content.decode("utf-8"),
+    )
+    skills_list = [skill.object for skill in skill_data]
+
+    # Filter by category
     if selected_category and selected_category != 'all':
-        skills_list = Skill.objects.filter(category=selected_category)
-    else:
-        skills_list = Skill.objects.all()
+        skills_list = [s for s in skills_list if getattr(s, 'category', None) == selected_category]
 
     categories = [
         ('all', 'All'),
@@ -94,3 +109,27 @@ def show_skill(request):
         'selected_category' : selected_category,
     }
     return render(request, "skill.html", context)
+
+def create_skill(request):
+    form = SkillForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Skill baru berhasil ditambahkan!")
+        return redirect("main:show_skill")
+
+    context = {
+        "name": "Nanta",
+        "form": form,
+    }
+    return render(request, "skill_form.html", context)
+
+def get_skill_json(request):
+    title_query = request.GET.get("title", "").strip()
+    skill_list = Skill.objects.all()
+
+    if title_query:
+        skill_list = skill_list.filter(title__icontains=title_query)
+
+    skill_json = serializers.serialize("json", skill_list)
+    return HttpResponse(skill_json, content_type="application/json")

@@ -642,15 +642,15 @@ h1, .brand {
     margin-top: 1.5rem;
 }
 
-.experience-status {
+/* ====================
+    Styling for Forms
+   ==================== */
+
+.form-status {
     margin-top: 1.5rem;
 }
 
-/* =========================
-    Styling Experience Form
-   ======================== */
-
-.experience-form {
+.form {
     width: 100%;
     max-width: 100%;
     margin-top: 1.5rem;
