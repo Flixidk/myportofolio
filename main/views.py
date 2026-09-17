@@ -76,11 +76,17 @@ def delete_experience(request, experience_id):
 def show_skill(request):
     selected_category = request.GET.get('cat', 'all')
 
-    # Filter based on category
+    # Fetch and deserialize JSON data
+    json_response = get_skill_json(request)
+    skill_data = serializers.deserialize(
+        "json",
+        json_response.content.decode("utf-8"),
+    )
+    skills_list = [skill.object for skill in skill_data]
+
+    # Filter by category
     if selected_category and selected_category != 'all':
-        skills_list = Skill.objects.filter(category=selected_category)
-    else:
-        skills_list = Skill.objects.all()
+        skills_list = [s for s in skills_list if getattr(s, 'category', None) == selected_category]
 
     categories = [
         ('all', 'All'),
