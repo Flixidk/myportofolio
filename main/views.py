@@ -53,6 +53,7 @@ def create_experience(request):
     context = {
         "name": "Nanta",
         "form": form,
+        "is_edit": False,
     }
     return render(request, "experience_form.html", context)
 
@@ -68,7 +69,8 @@ def edit_experience(request, experience_id):
     context = {
         "name": "Nanta",
         "form": form,
-        "experience" : experience
+        "experience" : experience,
+        "is_edit": True,
     }
     
     return render(request, "experience_form.html", context)
