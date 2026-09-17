@@ -133,3 +133,13 @@ def get_skill_json(request):
 
     skill_json = serializers.serialize("json", skill_list)
     return HttpResponse(skill_json, content_type="application/json")
+
+def delete_skill(request, skill_id):
+    skill = get_object_or_404(Skill, pk=skill_id)
+
+    if request.method == "POST":
+        skill.delete()
+        messages.success(request, "Skill berhasil dihapus!")
+        return redirect("main:show_skill")
+
+    return redirect("main:show_skill")
