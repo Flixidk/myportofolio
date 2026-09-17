@@ -7,7 +7,9 @@ from main.models import Experience
 from main.models import Skill
 from .forms import ExperienceForm, SkillForm
 
-# Functions for Main Landing Page
+''' ===============================
+    Functions for Main Landing Page
+    =============================== '''
 def show_main(request):
     context = {
         "name": "Nanta",
@@ -20,7 +22,9 @@ def show_main(request):
     }
     return render(request, "index.html", context)
 
-# Functions for Experience Page
+''' =============================
+    Functions for Experience Page
+    ============================= '''
 def show_experience(request):
     json_response = get_experience_json(request)
 
@@ -72,7 +76,9 @@ def delete_experience(request, experience_id):
 
     return redirect("main:show_experience")
 
-# Functions for Skill Page
+''' =========================
+    Functions for Skill Page
+    ========================= '''
 def show_skill(request):
     selected_category = request.GET.get('cat', 'all')
 
