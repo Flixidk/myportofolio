@@ -5,8 +5,9 @@ from django.http import HttpResponse
 
 from main.models import Experience
 from main.models import Skill
-from .forms import ExperienceForm
+from .forms import ExperienceForm, SkillForm
 
+# Functions for Main Landing Page
 def show_main(request):
     context = {
         "name": "Nanta",
@@ -19,6 +20,7 @@ def show_main(request):
     }
     return render(request, "index.html", context)
 
+# Functions for Experience Page
 def show_experience(request):
     json_response = get_experience_json(request)
 
@@ -70,6 +72,7 @@ def delete_experience(request, experience_id):
 
     return redirect("main:show_experience")
 
+# Functions for Skill Page
 def show_skill(request):
     selected_category = request.GET.get('cat', 'all')
 
@@ -94,3 +97,17 @@ def show_skill(request):
         'selected_category' : selected_category,
     }
     return render(request, "skill.html", context)
+
+def create_skill(request):
+    form = SkillForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Skill baru berhasil ditambahkan!")
+        return redirect("main:show_skill")
+
+    context = {
+        "name": "Nanta",
+        "form": form,
+    }
+    return render(request, "skill_form.html", context)

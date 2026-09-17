@@ -96,13 +96,13 @@ class SkillForm(ModelForm):
                         ),
             "description": TextInput(
                 attrs={
-                    "placeholder": "Ceritakan Pengalamanmu",
+                    "placeholder": "Deskripsi/Skill Level",
                     "maxlength" : 255,
                 }
             ),
             "icon_path" : URLInput(
                 attrs={
-                    "placeholder": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/...",
+                    "placeholder": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/... (Use SVG)",
                     "maxlength" : 255,
                 }
             ),
