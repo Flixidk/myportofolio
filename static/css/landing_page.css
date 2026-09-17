@@ -1,0 +1,347 @@
+/* ==========================
+    Styling for Landing page
+   ========================== */
+
+.hero {
+    padding: 4.5rem 0 5rem;
+}
+
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    grid-template-areas:
+        "identity photo"
+        "details  photo";
+    gap: 1.5rem 3rem;
+}
+
+.hero-identity {
+    grid-area: identity;
+}
+
+.hero-details {
+    grid-area: details;
+}
+
+.hero-kicker {
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.hero-identity h1 {
+    font-size: clamp(3rem, 7vw, 5rem);
+    line-height: 0.95;
+}
+
+.bio {
+    color: var(--text-muted);
+    max-width: 480px;
+    margin-bottom: 1.5rem;
+}
+
+.meta-list {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.meta-row dt {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 0.15rem;
+}
+
+.meta-row dd {
+    font-weight: 600;
+}
+
+.social-links {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.social-link {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--paper);
+    background-color: var(--ink);
+    border-radius: var(--radius);
+    padding: 0.5rem 1.1rem;
+    transition: background-color 0.2s ease;
+}
+
+.social-link:hover {
+    background-color: var(--accent);
+}
+
+.hero-photo {
+    grid-area: photo;
+    align-self: center;
+    position: relative;
+}
+
+.photo-block {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.25rem;
+    width: 100%;
+    height: 100%;
+    background-color: var(--accent);
+    border-radius: var(--radius);
+    z-index: 0;
+}
+
+.avatar {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 3px solid var(--ink);
+}
+
+.education-section h2 {
+    font-family: "Space Mono", monospace;
+    font-size: 2.5rem; 
+    color: var(--ink);
+    text-align: center; 
+    margin-bottom: 3rem; 
+    position: relative;
+}
+
+.education-section h2::after {
+    content: '';
+    display: block;
+    width: 60px; 
+    height: 4px;
+    background-color: var(--accent); 
+    margin: 0.75rem auto 0;
+    border-radius: var(--radius);
+}
+
+.education-timeline {
+    position: relative;
+    padding: 2rem 0; 
+}
+
+.education-timeline::before {
+    content: ''; 
+    height: 0;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    background-color: var(--line); 
+    transform: translateX(-50%); 
+}
+
+.timeline-node {
+    position: absolute;
+    top: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%); 
+    width: 16px;
+    height: 16px;
+    border-radius: 50%; 
+    background-color: var(--accent); 
+    border: 3px solid var(--paper); 
+    z-index: 1; 
+}
+
+.timeline-date {
+    position: absolute;
+    top: 2.2rem; 
+    width: 45%; 
+    font-weight: 700;
+    color: var(--accent-dark);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 3rem; 
+    display: flex;
+    justify-content: flex-end; 
+    padding-right: 55%; 
+}
+
+.timeline-item:nth-child(even) {
+    justify-content: flex-start; 
+    padding-right: 0; 
+    padding-left: 55%; 
+}
+
+.timeline-item .timeline-date {
+    left: 53%; 
+    text-align: left;
+}
+
+.timeline-item:nth-child(even) .timeline-date {
+    left: auto; 
+    right: 53%; 
+    text-align: right;
+}
+
+.timeline-content {
+    width: fit-content; 
+    max-width: 100%; 
+    padding: 1.5rem;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius);
+    background-color: #ffffff;
+    box-shadow: 4px 4px 0px var(--line);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.school-header {
+    display: flex;
+    align-items: center; 
+    gap: 1rem; 
+    margin-bottom: 1rem; 
+}
+
+.school-logo {
+    width: 48px; 
+    height: 48px;
+    object-fit: contain; 
+    border-radius: var(--radius);
+}
+
+.timeline-content ul {
+    padding-left: 1.25rem; 
+    margin-top: 0.5rem; 
+    color: var(--text-muted); 
+}
+
+.timeline-content li {
+    margin-bottom: 0.5rem; 
+    line-height: 1.5;
+}
+
+.timeline-content li::marker {
+    color: var(--accent-dark); 
+}
+
+/* ===================================
+   Styling for Landing Page animation
+   =================================== */
+
+/* Set keyframes for each animation */   
+@keyframes drawLine {
+    from { height: 0; }
+    to { height: 100%; }
+}
+
+@keyframes popNode {
+    from { opacity: 0; transform: translateX(-50%) scale(0); }
+    to { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-40px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Set initial positions, opacity and animation types for each element in timeline */
+.timeline-node, .timeline-content, .timeline-date {
+    opacity: 0; 
+}
+
+.is-visible .education-timeline::before {
+    animation: drawLine 2s linear forwards;
+}
+
+.is-visible .timeline-node {
+    animation: popNode 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.is-visible .timeline-item:nth-child(odd) .timeline-content { animation: slideInLeft 0.6s ease-out forwards; }
+.is-visible .timeline-item:nth-child(odd) .timeline-date { animation: slideInRight 0.6s ease-out forwards; }
+
+.is-visible .timeline-item:nth-child(even) .timeline-content { animation: slideInRight 0.6s ease-out forwards; }
+.is-visible .timeline-item:nth-child(even) .timeline-date { animation: slideInLeft 0.6s ease-out forwards; }
+
+/* Set delay for each timeline item */
+.is-visible .timeline-item:nth-child(1) .timeline-node { animation-delay: 0.3s; }
+.is-visible .timeline-item:nth-child(1) .timeline-content,
+.is-visible .timeline-item:nth-child(1) .timeline-date { animation-delay: 0.5s; }
+
+.is-visible .timeline-item:nth-child(2) .timeline-node { animation-delay: 1.0s; }
+.is-visible .timeline-item:nth-child(2) .timeline-content,
+.is-visible .timeline-item:nth-child(2) .timeline-date { animation-delay: 1.2s; }
+
+.is-visible .timeline-item:nth-child(3) .timeline-node { animation-delay: 1.7s; }
+.is-visible .timeline-item:nth-child(3) .timeline-content,
+.is-visible .timeline-item:nth-child(3) .timeline-date { animation-delay: 1.9s; }
+
+@media (max-width: 600px) {
+    .hero-grid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .hero-photo {
+        max-width: 220px;
+        margin: 0 auto;
+    }
+
+    .bio {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .meta-list, .social-links {
+        justify-content: center;
+    }
+
+    .education-timeline::before {
+        left: 20px;
+    }
+
+    .timeline-node {
+        left: 20px;
+    }
+
+    .timeline-item,
+    .timeline-item:nth-child(even) {
+        justify-content: flex-start;
+        padding-left: 45px; 
+        padding-right: 0;
+    }
+
+    .timeline-content {
+        width: 100%;
+    }
+    
+    .timeline-date,
+    .timeline-item .timeline-date,
+    .timeline-item:nth-child(even) .timeline-date {
+        position: static;
+        width: 100%;
+        text-align: left;
+        margin-bottom: 0.5rem;
+    }
+
+    .is-visible .timeline-item:nth-child(odd) .timeline-content,
+    .is-visible .timeline-item:nth-child(even) .timeline-content {
+        animation: slideInRight 0.6s ease-out forwards;
+    }
+}
