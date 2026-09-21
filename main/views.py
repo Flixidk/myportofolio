@@ -108,7 +108,11 @@ def create_experience(request):
     }
     return render(request, "experience_form.html", context)
 
+@login_required(login_url="/login/")
 def edit_experience(request, experience_id):
+    if not request.user.is_superuser:
+            raise PermissionDenied
+    
     experience = get_object_or_404(Experience, id=experience_id)
     form = ExperienceForm(request.POST or None, instance=experience)
 
@@ -133,7 +137,7 @@ def get_experience_json(request):
     if title_query:
         experience_list = experience_list.filter(title__icontains=title_query)
 
-    experience_json = serializers.serialize("json", experience_list)
+    experience_json = serializers.serialize("json", experience_list, use_natural_foreign_keys=True)
     return HttpResponse(experience_json, content_type="application/json")
 
 @login_required(login_url="/login/")
@@ -147,6 +151,20 @@ def delete_experience(request, experience_id):
         experience.delete()
         messages.success(request, "Pengalaman berhasil dihapus!")
         return redirect("main:show_experience")
+
+    return redirect("main:show_experience")
+
+@login_required(login_url="/login/")
+def toggle_star(request, experience_id):
+    experience = get_object_or_404(Experience, pk=experience_id)
+
+    if request.method == "POST":
+        # Kalau akun ini sudah pernah memberi star, batalkan star-nya.
+        # Kalau belum, tambahkan star
+        if request.user in experience.starred_by.all():
+            experience.starred_by.remove(request.user)
+        else:
+            experience.starred_by.add(request.user)
 
     return redirect("main:show_experience")
 
