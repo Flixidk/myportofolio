@@ -70,6 +70,10 @@ h1, .brand {
     font-size: 0.95rem;
 }
 
+.nav-user {
+    color: red;
+}
+
 .site-footer {
     padding: 1.5rem;
     color: var(--text-muted);
