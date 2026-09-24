@@ -3,7 +3,7 @@ import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.contrib.auth.decorators import login_required  
+from django.contrib.auth.decorators import login_required, permission_required  
 from django.core.exceptions import PermissionDenied        
 from django.contrib import messages
 from django.core import serializers
@@ -108,10 +108,9 @@ def create_experience(request):
     }
     return render(request, "experience_form.html", context)
 
-@login_required(login_url="/login/")
+@login_required(login_url='/login/')
+@permission_required('main.change_experience', raise_exception=True)
 def edit_experience(request, experience_id):
-    if not request.user.is_superuser:
-            raise PermissionDenied
     
     experience = get_object_or_404(Experience, id=experience_id)
     form = ExperienceForm(request.POST or None, instance=experience)
