@@ -68,6 +68,8 @@ class Skill(models.Model):
         help_text="Lower numbers display first"
         )
 
+    endorsed_by = models.ManyToManyField(User, related_name="endorsed_skill", blank=True)
+
     class Meta:
         ordering = ['order', 'title']
 

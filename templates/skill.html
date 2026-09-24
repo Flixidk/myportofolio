@@ -41,8 +41,9 @@
                             </div>
                             <div class="card-body">
                                 <h3>{{ skill.title }}</h3>
+                                {% include "components/skill_endorsement.html" with skill=skill %}
                                 {% if skill.description %}
-                                    <p>{{ skill.description }}</p>
+                                    <p class="skill-description">{{ skill.description }}</p>
                                 {% endif %}
                             </div>
                         </div>

@@ -226,7 +226,7 @@ def get_skill_json(request):
     if title_query:
         skill_list = skill_list.filter(title__icontains=title_query)
 
-    skill_json = serializers.serialize("json", skill_list)
+    skill_json = serializers.serialize("json", skill_list, use_natural_foreign_keys=True)
     return HttpResponse(skill_json, content_type="application/json")
 
 @login_required(login_url='/login/')
@@ -240,5 +240,19 @@ def delete_skill(request, skill_id):
         skill.delete()
         messages.success(request, "Skill berhasil dihapus!")
         return redirect("main:show_skill")
+
+    return redirect("main:show_skill")
+
+@login_required(login_url="/login/")
+def toggle_endorsement(request, skill_id):
+    skill = get_object_or_404(Skill, pk=skill_id)
+
+    if request.method == "POST":
+        # Kalau akun ini sudah pernah memberi endorsement, batalkan endorsement-nya.
+        # Kalau belum, tambahkan endorsement
+        if request.user in skill.endorsed_by.all():
+            skill.endorsed_by.remove(request.user)
+        else:
+            skill.endorsed_by.add(request.user)
 
     return redirect("main:show_skill")
