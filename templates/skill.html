@@ -15,17 +15,22 @@
                             {{ label }}
                         </a>
                     {% endfor %}
-                    <a href="{% url 'main:create_skill' %}"
-                        class="filter-pill create-skill-pill">
-                            <span aria-hidden="true">+</span>
-                            Tambah Skill
+                    {% if user.is_superuser %}
+                        <a href="{% url 'main:create_skill' %}"
+                            class="filter-pill create-skill-pill">
+                                <span aria-hidden="true">+</span>
+                                Tambah Skill
                         </a>
+                    {% endif %}
                 </div>
                 
                 <div class="bento-grid">
                     {% for skill in skills_list %}
                         <div class="bento-card">
+
+                            {% if user.is_superuser %}
                             {% include "components/skill_delete_modal.html" with skill=skill %}
+                            {% endif %}
 
                             <div class="card-header">
                                 <img 
@@ -36,8 +41,9 @@
                             </div>
                             <div class="card-body">
                                 <h3>{{ skill.title }}</h3>
+                                {% include "components/skill_endorsement.html" with skill=skill %}
                                 {% if skill.description %}
-                                    <p>{{ skill.description }}</p>
+                                    <p class="skill-description">{{ skill.description }}</p>
                                 {% endif %}
                             </div>
                         </div>

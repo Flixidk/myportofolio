@@ -123,6 +123,126 @@
     margin-bottom: 0.5rem;
 }
 
+.card-body {
+    display: grid;
+    grid-template-columns: 1fr auto; /* Col 1: title/desc (takes leftover space), Col 2: button */
+    grid-template-rows: auto auto;    /* Row 1: title, Row 2: description */
+    gap: 4px 12px;                    /* 4px vertical gap, 12px horizontal gap */
+}
+
+.card-body h3 {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+}
+
+.card-body .skill-description {
+    grid-column: 1;
+    grid-row: 2;
+    margin: 0;
+}
+
+.skill-endorse-form {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;   
+    justify-self: end;    
+    display: inline-flex;
+}
+
+.skill-button-endorse {
+    scale: 0.8;
+    display: inline-flex;
+    align-items: center;
+    background: var(--ink);
+}
+
+.skill-button-endorse.is-endorsed {
+    background: var(--accent);
+    color : var(--ink);
+}
+
+.skill-endorse-count {
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.25);
+    font-size: 0.8rem;
+}
+
+.skill-endorse-count.is-endorsed {
+    background: rgba(241, 233, 233, 0.902);
+}
+
+/* Tooltip Wrapper Container */
+.endorse-tooltip-wrapper {
+    position: relative;
+    display: inline-flex;
+}
+
+/* Tooltip Popup (Hidden by default) */
+.endorse-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: 125%;              
+    right: 0;                  
+    min-width: 130px;
+    max-width: 200px;
+    padding: 8px 10px;
+    background-color: var(--accent); 
+    color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    font-size: 0.75rem;
+    z-index: 50;
+    pointer-events: none;      
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: translateY(4px);
+}
+
+.endorse-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    right: 12px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--accent) transparent transparent transparent;
+}
+
+.endorse-tooltip-wrapper:hover .endorse-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tooltip-title {
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+}
+
+.tooltip-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tooltip-list li {
+    padding: 1px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--ink);
+}
+
+.tooltip-more, .tooltip-empty {
+    margin-top: 4px;
+    font-size: 0.7rem;
+    color: var(--ink);
+    font-style: italic;
+}
+
 
 .bento-card h3 {
     font-family: "Space Mono", monospace;

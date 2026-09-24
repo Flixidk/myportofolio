@@ -1,0 +1,27 @@
+<div class="endorse-tooltip-wrapper">
+    <form method="post" action="{% url 'main:toggle_endorsement' skill.id %}" class="skill-endorse-form">
+        {% csrf_token %}
+        <button type="submit"
+                class="button skill-button-endorse{% if user in skill.endorsed_by.all %} is-endorsed{% endif %}">
+            <span aria-hidden="true">✓</span>
+            <span class="skill-endorse-count">{{ skill.endorsed_by.count }}</span>
+        </button>
+    </form>
+
+    <!-- Custom Popup Tooltip for List of Endorsers -->
+    <div class="endorse-tooltip" role="tooltip">
+        <div class="tooltip-title">Diendorse oleh:</div>
+        {% if skill.endorsed_by.all %}
+            <ul class="tooltip-list">
+                {% for endorser in skill.endorsed_by.all|slice:":5" %}
+                    <li>{{ endorser.username }}</li>
+                {% endfor %}
+            </ul>
+            {% if skill.endorsed_by.count > 5 %}
+                <div class="tooltip-more">+{{ skill.endorsed_by.count|add:"-5" }} lainnya</div>
+            {% endif %}
+        {% else %}
+            <div class="tooltip-empty">Jadilah yang pertama!</div>
+        {% endif %}
+    </div>
+</div>

@@ -30,7 +30,7 @@ class Experience(models.Model):
     started_at = models.DateField(blank=True, null=True,)
     ended_at = models.DateField()
 
-    starred_by = models.ManyToManyField(User, related_name="starred_projects", blank=True)
+    starred_by = models.ManyToManyField(User, related_name="starred_experience", blank=True)
 
     def __str__(self):
         return self.title   
@@ -67,6 +67,8 @@ class Skill(models.Model):
         default=0, 
         help_text="Lower numbers display first"
         )
+
+    endorsed_by = models.ManyToManyField(User, related_name="endorsed_skill", blank=True)
 
     class Meta:
         ordering = ['order', 'title']
