@@ -201,7 +201,11 @@ def show_skill(request):
     }
     return render(request, "skill.html", context)
 
+@login_required(login_url='/login/')
 def create_skill(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
     form = SkillForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
@@ -225,7 +229,11 @@ def get_skill_json(request):
     skill_json = serializers.serialize("json", skill_list)
     return HttpResponse(skill_json, content_type="application/json")
 
+@login_required(login_url='/login/')
 def delete_skill(request, skill_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    
     skill = get_object_or_404(Skill, pk=skill_id)
 
     if request.method == "POST":
