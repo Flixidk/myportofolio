@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied        
 from django.contrib import messages
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 from main.models import Experience
 from main.models import Skill
@@ -73,18 +73,10 @@ def show_main(request):
     Functions for Experience Page
     ============================= '''
 def show_experience(request):
-    json_response = get_experience_json(request)
-
-    experience_data = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    experience_list = [experience.object for experience in experience_data]
     title_query = request.GET.get("title", "").strip()
 
     context = {
         "name": "Nanta",
-        "experience_list": experience_list,
         "title_query" : title_query,
     }
     return render(request, "experience.html", context)
@@ -131,13 +123,32 @@ def edit_experience(request, experience_id):
 
 def get_experience_json(request):
     title_query = request.GET.get("title", "").strip()
-    experience_list = Experience.objects.all()
+    experience_list = Experience.objects.prefetch_related('starred_by').all()
 
     if title_query:
         experience_list = experience_list.filter(title__icontains=title_query)
 
-    experience_json = serializers.serialize("json", experience_list, use_natural_foreign_keys=True)
-    return HttpResponse(experience_json, content_type="application/json")
+    data = []
+    for experience in experience_list:
+        starred_users = experience.starred_by.all()
+        is_starred = request.user in starred_users if request.user.is_authenticated else False
+        starred_by_names = ", ".join([u.username for u in starred_users])
+
+        data.append({
+            "pk": str(experience.id),
+            "fields": {
+                "title": experience.title,
+                "description": experience.description,
+                "category": experience.category,
+                "started_at" : str(experience.started_at) if experience.started_at else None,
+                "ended_at" : str(experience.ended_at),
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
 
 @login_required(login_url="/login/")
 def delete_experience(request, experience_id):

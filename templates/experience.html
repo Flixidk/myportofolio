@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-
 {% block content %}
     <main>
         <!-- Main Experience Section -->
@@ -10,10 +9,9 @@
                 <h2>My Experience</h2>
 
                 <div class="experience-actions">
-                    <form method="get"
-                        action="{% url 'main:show_experience' %}"
-                        class="experience-search">
+                    <form id="experience-search-form" class="experience-search">
                         <input type="search"
+                            id="search-input"
                             name="title"
                             value="{{ title_query }}"
                             placeholder="Cari berdasarkan nama pengalaman"
@@ -31,47 +29,161 @@
                     {% endif %}
                 </div>
 
-                <div class="metro-map">
-                    {% for exp in experience_list %}
-                        <div class="metro-station year-{{ exp.started_at|date:'Y' }} {% if exp.is_ongoing %}active-station{% endif %}">
-                
-                            <!-- Station Stop (Node on the line) -->
-                            <div class="node"></div>
-                            <!-- Station Info Card -->
-                            <div class="station-card">
-                                <span class="route-badge">{{ exp.get_category_display }}</span>
-                                <h3>{{ exp.title }}</h3>
-                                <time>{{ exp.ended_at|date:"Y" }}</time>
-                                <p>{{ exp.description }}</p>
-                                <div class="experience-actions">
-                                    {% include "components/experience_star.html" with experience=exp %}
-
-                                    {% if user.is_superuser %}
-                                        {% include "components/experience_delete_modal.html" with experience=exp %}
-                                    {% endif %}
-
-                                    {% if perms.main.change_experience %}
-                                    <a href="{% url 'main:edit_experience' exp.id %}" class="button button-secondary">
-                                        Edit
-                                    </a>
-                                    {% endif %}
-                                    
-                                
-                                    
-                                </div>
-                            </div>
-                        </div>
-
-                    {% empty %}
-                    <!-- Metro-themed Empty State -->
-                    <div class="metro-empty-state">
-                        <div class="empty-station-icon">🚧</div>
-                        <h3>Line Under Construction</h3>
-                        <p>No stations built yet. Check back soon for upcoming stops on this route!</p>
-                    </div>
-                    {% endfor %}
+                <div id="loading" class="empty-state hide">
+                    <p>Memuat data pengalaman...</p>
                 </div>
+
+                <div id="error" class="empty-state hide">
+                    <p>Gagal memuat data pengalaman. Silakan coba lagi.</p>
+                </div>
+
+                <div id="empty" class="empty-state hide">
+                    <p>Belum ada pengalaman yang ditambahkan atau ditemukan.</p>
+                </div>
+
+                <div id="grid" class="metro-map hide"></div>
             </div>
         </section>
     </main>
 {% endblock content %}
+
+{% block script %}
+    <script>
+        // Konfigurasi
+        const BASE_EXPERIENCES_ENDPOINT = "{% url 'main:get_experience_json' %}";
+        const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
+        const CAN_EDIT = "{% if perms.main.change_experience %}true{% else %}false{% endif %}" === "true";
+        let experiencesAbortController;
+
+        // Elemen DOM
+        const loadingState = document.getElementById('loading');
+        const errorState = document.getElementById('error');
+        const emptyState = document.getElementById('empty');
+        const gridContainer = document.getElementById('grid');
+        const searchForm = document.getElementById('experience-search-form');
+        const searchInput = document.getElementById('search-input');
+
+        // Menyembunyikan/Menampilkan section halaman
+        function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
+            loadingState.classList.toggle('hide', !showLoading);
+            errorState.classList.toggle('hide', !showError);
+            emptyState.classList.toggle('hide', !showEmpty);
+            gridContainer.classList.toggle('hide', !showGrid);
+        }
+
+        // Membuat elemen Metro Station Card
+        function buildExperienceCardElement(item) {
+            const experience = item.fields;
+            const experienceId = item.pk;
+
+            // Outer container matching original <div class="metro-station year-YYYY">
+            const stationElement = document.createElement('div');
+            
+            // Parse years from date strings (e.g., "2026-09-28" -> "2026")
+            const startYear = experience.started_at ? experience.started_at.split('-')[0] : '';
+            const endYear = experience.ended_at ? experience.ended_at.split('-')[0] : 'Present';
+
+            stationElement.className = `metro-station year-${startYear}`;
+
+            // Dummy UUID untuk digantikan ID asli dari data JSON
+            const starUrl = "{% url 'main:toggle_star' '00000000-0000-0000-0000-000000000000' %}"
+                .replace('00000000-0000-0000-0000-000000000000', experienceId);
+            const deleteUrl = "{% url 'main:delete_experience' '00000000-0000-0000-0000-000000000000' %}"
+                .replace('00000000-0000-0000-0000-000000000000', experienceId);
+            const editUrl = "{% url 'main:edit_experience' '00000000-0000-0000-0000-000000000000' %}"
+                .replace('00000000-0000-0000-0000-000000000000', experienceId);
+
+            // Star state details
+            const isStarredClass = experience.is_starred ? " is-starred" : "";
+            const starText = experience.is_starred ? "Unstar" : "Star";
+            const starTitle = experience.star_count > 0 
+                ? `Dibintangi oleh ${experience.starred_by_names}` 
+                : "Jadilah yang pertama memberi star";
+
+            // Dynamic Action Buttons
+            const deleteHtml = IS_SUPERUSER 
+                ? `<form method="post" action="${deleteUrl}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="button button-danger" onclick="return confirm('Yakin ingin menghapus pengalaman ini?');">Hapus</button>
+                </form>`
+                : '';
+
+            const editHtml = CAN_EDIT
+                ? `<a href="${editUrl}" class="button button-secondary">Edit</a>`
+                : '';
+
+            stationElement.innerHTML = `
+                <div class="node"></div>
+                <div class="station-card">
+                    <span class="route-badge">${experience.category}</span>
+                    <h3>${experience.title}</h3>
+                    <time>${endYear}</time>
+                    <p>${experience.description}</p>
+                    <div class="experience-actions">
+                        <form method="post" action="${starUrl}" class="star-form" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                    class="button button-star${isStarredClass}"
+                                    title="${starTitle}">
+                                <span aria-hidden="true">★</span>
+                                ${starText}
+                                <span class="star-count">${experience.star_count}</span>
+                            </button>
+                        </form>
+
+                        ${deleteHtml}
+                        ${editHtml}
+                    </div>
+                </div>
+            `;
+
+            return stationElement;
+        }
+
+        // Fetch data experience via AJAX
+        async function fetchExperiences(searchQuery = "") {
+            if (experiencesAbortController) experiencesAbortController.abort();
+            experiencesAbortController = new AbortController();
+
+            try {
+                displayPageSection({ showLoading: true });
+                
+                const url = searchQuery 
+                    ? `${BASE_EXPERIENCES_ENDPOINT}?title=${encodeURIComponent(searchQuery)}` 
+                    : BASE_EXPERIENCES_ENDPOINT;
+                
+                const response = await fetch(url, {
+                    headers: { 'Accept': 'application/json' },
+                    signal: experiencesAbortController.signal,
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch data');
+
+                const experienceData = await response.json();
+
+                if (experienceData.length === 0) {
+                    displayPageSection({ showEmpty: true });
+                } else {
+                    gridContainer.innerHTML = '';
+                    experienceData.forEach(item => {
+                        gridContainer.appendChild(buildExperienceCardElement(item));
+                    });
+                    displayPageSection({ showGrid: true });
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                console.error('Error loading experiences:', error);
+                displayPageSection({ showError: true });
+            }
+        }
+
+        // Event Handler untuk Form Search
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetchExperiences(searchInput.value.trim());
+        });
+
+        // Start application
+        fetchExperiences(searchInput.value.trim());
+    </script>
+{% endblock script %}
