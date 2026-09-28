@@ -124,7 +124,6 @@ def create_experience_ajax(request):
 @login_required(login_url='/login/')
 @permission_required('main.change_experience', raise_exception=True)
 def edit_experience(request, experience_id):
-    
     experience = get_object_or_404(Experience, id=experience_id)
     form = ExperienceForm(request.POST or None, instance=experience)
 
