@@ -23,6 +23,11 @@
     --radius: 4px;
 }
 
+
+.hide {
+    display: none !important;
+}
+
 body {
     font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: var(--ink);
@@ -293,58 +298,50 @@ h1, .brand {
     Styling for Toast Messages
    ============================ */
 
-   .toast-container {
+.toast-component {
     position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.toast {
-    display: flex;
+    inset: auto 2rem 2rem auto;
+    margin: 0;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius);
+    box-shadow: 0 10px 25px rgba(28, 25, 23, 0.15);
+    display: none;
     align-items: center;
-    justify-content: space-between;
-    gap: 1.5rem;
-    min-width: 280px;
-    padding: 0.875rem 1.25rem;
-    border-radius: 8px;
-    color: #ffffff;
-    background: #333333;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-    animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-/* Variant colors based on Django message tags */
-.toast-success { background: #1e7e34; }
-.toast-error   { background: #bd2130; }
-.toast-warning { background: #d39e00; }
-.toast-info    { background: #117a8b; }
-
-.toast-close {
-    background: none;
-    border: none;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    background-color: var(--paper);
+    border: 1px solid var(--line);
     color: inherit;
-    font-size: 1.25rem;
-    cursor: pointer;
-    line-height: 1;
-    opacity: 0.8;
 }
 
-.toast-close:hover {
-    opacity: 1;
+.toast-component:popover-open {
+    display: flex;
 }
 
-/* Animation styling */
-@keyframes slideIn {
-    from { transform: translateX(120%); opacity: 0; }
-    to   { transform: translateX(0); opacity: 1; }
-}
-
-.toast-hide {
+.toast-hidden {
     opacity: 0;
-    transform: translateX(120%);
+    transform: translateY(150%);
+    pointer-events: none;
 }
+
+.toast-show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.15rem;
+    font-family: "Space Grotesk", -apple-system, sans-serif;
+}
+
+.toast-message {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Modifikasi border kiri berdasarkan tipe notifikasi */
+.toast-success { border-left: 4px solid #22c55e; }
+.toast-error { border-left: 4px solid #b42318; }
+.toast-normal { border-left: 4px solid var(--accent); }

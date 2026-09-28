@@ -1,4 +1,6 @@
 from django.forms import ModelForm, TextInput, Textarea, URLInput, DateInput, Select, NumberInput
+from django.core.exceptions import ValidationError
+from django.utils.html import strip_tags
 
 from main.models import Experience, Skill
 
@@ -57,6 +59,15 @@ class ExperienceForm(ModelForm):
                 }
             ),
         }
+
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data["title"]).strip()
+        if not title:
+            raise ValidationError("Nama pengalaman tidak boleh hanya berisi tag HTML.")
+        return title
+
+    def clean_description(self):
+        return strip_tags(self.cleaned_data["description"]).strip()
 
 SKILL_CATEGORY_CHOICES = [
         ('frontend', 'Frontend'),
