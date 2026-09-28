@@ -1,10 +1,8 @@
-{% if messages %}
-  <div class="toast-container" id="toast-container">
-    {% for message in messages %}
-      <div class="toast toast-{{ message.tags }}">
-        <span>{{ message }}</span>
-        <button type="button" class="toast-close" onclick="this.parentElement.remove()">×</button>
+{% load static %}
+  <div id="toast-component" class="toast-component toast-hidden" popover="manual">
+      <div class="toast-content">
+          <h3 id="toast-title" class="toast-title">This is a Sample Title</h3>
+          <p id="toast-message" class="toast-message">This is a Sample Message</p>
       </div>
-    {% endfor %}
   </div>
-{% endif %}
+  <script src="{% static 'js/toast.js' %}"></script>

@@ -8,6 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.http import require_POST
 
 from main.models import Experience
 from main.models import Skill
@@ -78,6 +79,7 @@ def show_experience(request):
     context = {
         "name": "Nanta",
         "title_query" : title_query,
+        "form": ExperienceForm(),
     }
     return render(request, "experience.html", context)
 
@@ -99,6 +101,25 @@ def create_experience(request):
         "is_edit": False,
     }
     return render(request, "experience_form.html", context)
+
+@login_required(login_url="/login/")
+@require_POST
+def create_experience_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan pengalaman."},
+            status=403,
+        )
+
+    form = ExperienceForm(request.POST)
+    if form.is_valid():
+        experience = form.save()
+        return JsonResponse(
+            {"message": "Pengalaman berhasil ditambahkan.", "pk": str(experience.id)},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 @login_required(login_url='/login/')
 @permission_required('main.change_experience', raise_exception=True)
@@ -139,7 +160,7 @@ def get_experience_json(request):
             "fields": {
                 "title": experience.title,
                 "description": experience.description,
-                "category": experience.category,
+                "category": experience.get_category_display(),
                 "started_at" : str(experience.started_at) if experience.started_at else None,
                 "ended_at" : str(experience.ended_at),
                 "star_count": starred_users.count(),
