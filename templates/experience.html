@@ -80,6 +80,7 @@
             gridContainer.classList.toggle('hide', !showGrid);
         }
 
+        // Fungsi proteksi XSS untuk menggantikan special characters dengan value yang aman
         function escapeHtml(value) {
         return String(value ?? '')
             .replaceAll('&', '&amp;')
@@ -145,7 +146,7 @@
                         <form method="post" action="${starUrl}" class="star-form" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" 
-                                    class="button button-star${isStarredClass}"
+                                    class="button experience-button-star ${isStarredClass}"
                                     title="${starTitle}">
                                 <span aria-hidden="true">★</span>
                                 ${starText}
@@ -162,10 +163,12 @@
             return stationElement;
         }
 
+        // Fungsi untuk menutup modal add-experience
         function closeExperienceModal() {
             document.getElementById("add-experience-modal").hidePopover();
         }
 
+        // Fungsi untuk membuka modal delete experience
         function openDeleteModal(deleteUrl, title) {
             const modal = document.getElementById('delete-experience-modal');
             const form = document.getElementById('delete-modal-form');
@@ -228,7 +231,8 @@
                 submitButton.disabled = false;
             }
         }
-
+        
+        // Membuat event listener untuk submit form addExperience
         if (experienceForm) {
             experienceForm.addEventListener('submit', addExperience);
         }
@@ -270,10 +274,12 @@
             }
         }
 
+        // Fungsi untuk menjalankan fetchExperience dengan searchInput yang diketik
         function searchExperiences() {
             fetchExperiences(searchInput.value.trim());
         }
 
+        // Event listener untuk search bar dengan debounce 
         searchInput.addEventListener("input", function() {
             clearTimeout(searchDebounceTimer);
 
@@ -282,6 +288,7 @@
             }, SEARCH_DEBOUNCE_DELAY);
         });
 
+        // Event listener untuk search bar melalui manual submit
         searchForm.addEventListener("submit", function(event) {
             event.preventDefault();
             clearTimeout(searchDebounceTimer);

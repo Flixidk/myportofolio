@@ -1,38 +1,31 @@
-<button type="button" 
-        class="bento-card__delete" 
-        popovertarget="delete-skill-{{ skill.id }}" 
-        aria-label="Hapus {{ skill.name }}">
-    ×
-</button>
-
-<div id="delete-skill-{{ skill.id }}"
+<div id="delete-skill-modal"
      class="delete-modal"
      popover="auto"
      role="dialog"
      aria-modal="true"
-     aria-labelledby="delete-skill-title-{{ skill.id }}">
+     aria-labelledby="delete-skill-title">
     <button type="button"
             class="delete-modal__backdrop"
-            popovertarget="delete-skill-{{ skill.id }}"
+            popovertarget="delete-skill-modal"
             popovertargetaction="hide"
             aria-label="Tutup konfirmasi hapus"></button>
     <div class="delete-modal__content">
         <button type="button"
                 class="delete-modal__close"
-                popovertarget="delete-skill-{{ skill.id }}"
+                popovertarget="delete-skill-modal"
                 popovertargetaction="hide"
                 aria-label="Tutup konfirmasi hapus">×</button>
-        <h2 id="delete-skill-title-{{ skill.id }}">Hapus Skill?</h2>
+        <h2 id="delete-skill-title">Hapus Skill?</h2>
         <p>
             Apakah Anda yakin ingin menghapus
-            <strong>{{ skill.title }}</strong>?
+            <strong id="delete-modal-item-title"></strong>?
         </p>
         <div class="delete-modal__actions">
             <button type="button"
                     class="button button-secondary"
-                    popovertarget="delete-skill-{{ skill.id }}"
+                    popovertarget="delete-skill-modal"
                     popovertargetaction="hide">Batal</button>
-            <form method="post" action="{% url 'main:delete_skill' skill.id %}">
+            <form method="post" id="delete-modal-form" action="">
                 {% csrf_token %}
                 <button type="submit" class="button button-danger">Ya, Hapus</button>
             </form>

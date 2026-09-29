@@ -137,7 +137,7 @@
 }
 
 .card-body .skill-description {
-    grid-column: 1;
+    grid-column: 1 / span 2;
     grid-row: 2;
     margin: 0;
 }
@@ -323,6 +323,77 @@
     line-height: 1.5;
 }
 
+.skill-form-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 1rem;
+    border: 0;
+    background: transparent;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+}
+
+.skill-form-modal:popover-open {
+    display: flex;
+}
+
+.skill-form-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    padding: 0;
+    background: rgba(28, 25, 23, 0.58);
+    cursor: default;
+}
+
+.skill-form-modal__content {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 640px);
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 1rem 3rem rgba(28, 25, 23, 0.22);
+}
+
+.skill-form-modal__content h2 {
+    margin: 0 2.5rem 1.25rem 0;
+    font-family: "Space Mono", monospace;
+    font-size: 1.5rem;
+}
+
+.skill-form-modal__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.skill-form-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
 @media (max-width: 600px) {
     .container, 
     .skill-section {
@@ -339,6 +410,27 @@
     .bento-card:nth-child(7n + 4) {
         grid-column: span 1;
         grid-row: span 1;
+    }
+
+    .skill-form-modal {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .skill-form-modal__content {
+        width: 100%;
+        max-height: 90vh;
+        padding: 1.25rem;
+        border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .skill-form-modal__actions {
+        flex-direction: column-reverse;
+    }
+
+    .skill-form-modal__actions .button {
+        width: 100%;
+        text-align: center;
     }
 }
 
