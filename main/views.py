@@ -84,25 +84,6 @@ def show_experience(request):
     return render(request, "experience.html", context)
 
 @login_required(login_url="/login/")
-def create_experience(request):
-    if not request.user.is_superuser:
-        raise PermissionDenied
-    
-    form = ExperienceForm(request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Pengalaman baru berhasil ditambahkan!")
-        return redirect("main:show_experience")
-
-    context = {
-        "name": "Nanta",
-        "form": form,
-        "is_edit": False,
-    }
-    return render(request, "experience_form.html", context)
-
-@login_required(login_url="/login/")
 @require_POST
 def create_experience_ajax(request):
     if not request.user.is_superuser:
@@ -121,25 +102,18 @@ def create_experience_ajax(request):
 
     return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
-@login_required(login_url='/login/')
-@permission_required('main.change_experience', raise_exception=True)
-def edit_experience(request, experience_id):
+@login_required(login_url="/login/")
+@permission_required("main.change_experience", raise_exception=True)
+@require_POST
+def edit_experience_ajax(request, experience_id):
     experience = get_object_or_404(Experience, id=experience_id)
-    form = ExperienceForm(request.POST or None, instance=experience)
-
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Pengalaman berhasil diedit!")
-        return redirect("main:show_experience")
-
-    context = {
-        "name": "Nanta",
-        "form": form,
-        "experience" : experience,
-        "is_edit": True,
-    }
+    form = ExperienceForm(request.POST, instance=experience)
     
-    return render(request, "experience_form.html", context)
+    if form.is_valid():
+        form.save()
+        return JsonResponse({"message": "Pengalaman berhasil diperbarui."}, status=200)
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 def get_experience_json(request):
     title_query = request.GET.get("title", "").strip()
@@ -159,7 +133,8 @@ def get_experience_json(request):
             "fields": {
                 "title": experience.title,
                 "description": experience.description,
-                "category": experience.get_category_display(),
+                "category" : experience.category,
+                "category_display": experience.get_category_display(),
                 "started_at" : str(experience.started_at) if experience.started_at else None,
                 "ended_at" : str(experience.ended_at),
                 "star_count": starred_users.count(),
