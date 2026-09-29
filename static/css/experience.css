@@ -127,39 +127,6 @@
     background: rgba(241, 233, 233, 0.902);
 }
 
-.metro-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1.5rem;
-  text-align: center;
-  background-color: #f8fafc;
-  border: 2px dashed #cbd5e1;
-  border-radius: 12px;
-  color: #64748b;
-  margin-left: -20px; 
-}
-
-.empty-station-icon {
-  font-size: 2.5rem;
-  margin-bottom: 0.75rem;
-  opacity: 0.8;
-}
-
-.metro-empty-state h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: #334155;
-}
-
-.metro-empty-state p {
-  margin: 0;
-  font-size: 0.9rem;
-  max-width: 320px;
-}
-
 .experience-form-modal {
     display: none;
     position: fixed;
