@@ -21,7 +21,7 @@ urlpatterns = [
     path("projects/<uuid:experience_id>/star/", toggle_star, name="toggle_star",),
 
     path("skill/", show_skill, name="show_skill"),
-    path("skill/add/", create_skill, name="create_skill"),
+    path("skill/add-ajax/", create_skill_ajax, name="create_skill_ajax"),
     path("api/skill", get_skill_json, name="get_skill_json"),
     path("skill/<uuid:skill_id>/delete/",delete_skill, name="delete_skill"),
     path("skill/<uuid:skill_id>/endorse/", toggle_endorsement, name="toggle_endorsement",),

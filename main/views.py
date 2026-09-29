@@ -220,23 +220,24 @@ def show_skill(request):
     }
     return render(request, "skill.html", context)
 
-@login_required(login_url='/login/')
-def create_skill(request):
+@login_required(login_url="/login/")
+@require_POST
+def create_skill_ajax(request):
     if not request.user.is_superuser:
-        raise PermissionDenied
-    
-    form = SkillForm(request.POST or None)
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan skill."},
+            status=403,
+        )
 
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Skill baru berhasil ditambahkan!")
-        return redirect("main:show_skill")
+    form = SkillForm(request.POST)
+    if form.is_valid():
+        skill = form.save()
+        return JsonResponse(
+            {"message": "Skill berhasil ditambahkan.", "pk": str(skill.id)},
+            status=201,
+        )
 
-    context = {
-        "name": "Nanta",
-        "form": form,
-    }
-    return render(request, "skill_form.html", context)
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 def get_skill_json(request):
     selected_category = request.GET.get('cat', 'all')

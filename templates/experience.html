@@ -146,7 +146,7 @@
                         <form method="post" action="${starUrl}" class="star-form" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" 
-                                    class="button button-star${isStarredClass}"
+                                    class="button experience-button-star ${isStarredClass}"
                                     title="${starTitle}">
                                 <span aria-hidden="true">★</span>
                                 ${starText}
