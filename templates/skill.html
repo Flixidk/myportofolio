@@ -11,6 +11,7 @@
                 <div class="category-filters">
                     {% for slug, label in categories %}
                         <a href="?cat={{ slug }}" 
+                        data-category="{{ slug }}"
                         class="filter-pill {% if selected_category == slug %}active{% endif %}">
                             {{ label }}
                         </a>
@@ -23,41 +24,309 @@
                         </a>
                     {% endif %}
                 </div>
-                
-                <div class="bento-grid">
-                    {% for skill in skills_list %}
-                        <div class="bento-card">
 
-                            {% if user.is_superuser %}
-                            {% include "components/skill_delete_modal.html" with skill=skill %}
-                            {% endif %}
-
-                            <div class="card-header">
-                                <img 
-                                    src="{{ skill.icon_path }}" 
-                                    alt="{{ skill.title }} logo" 
-                                    class="skill-icon-svg"
-                                />
-                            </div>
-                            <div class="card-body">
-                                <h3>{{ skill.title }}</h3>
-                                {% include "components/skill_endorsement.html" with skill=skill %}
-                                {% if skill.description %}
-                                    <p class="skill-description">{{ skill.description }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                    {% empty %}
-                        <div class="empty-skill-state">
-                            <div class="empty-skill-icon">📦</div>
-                            <h3>No Skills Found</h3>
-                            <p>Add skills from Django Admin Dashboard</p>
-                        </div>
-                    {% endfor %}
+                <div id="loading" class="empty-skill-state hide">
+                    <p>Memuat data skills...</p>
                 </div>
+
+                <div id="error" class="empty-skill-state hide">
+                    <p>Gagal memuat data skills. Silakan coba lagi.</p>
+                </div>
+
+                <div id="empty" class="empty-skill-state hide">
+                    <div class="empty-skill-icon">📦</div>
+                    <p>Belum ada skills yang ditambahkan atau ditemukan.</p>
+                </div>
+                
+                <div id="grid" class="bento-grid"></div>
             </div>
 
         </section>
     </main>
+
+{% if user.is_superuser %}
+    {% include "components/skill_delete_modal.html" %}
+{% endif %}
+
 {% endblock content %}
+
+{% block script %}
+    <script>
+        // Konfigurasi
+        const BASE_SKILLS_ENDPOINT = "{% url 'main:get_skill_json' %}";
+        const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
+        let skillsAbortController;
+
+        // Elemen DOM
+        const loadingState = document.getElementById('loading');
+        const errorState = document.getElementById('error');
+        const emptyState = document.getElementById('empty');
+        const gridContainer = document.getElementById('grid');
+        const categoryPills = document.querySelectorAll('.category-filters a.filter-pill:not(.create-skill-pill)');
+        const SEARCH_DEBOUNCE_DELAY = 300;
+        let searchDebounceTimer;
+
+        // Menyembunyikan/Menampilkan section halaman
+        function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
+            loadingState.classList.toggle('hide', !showLoading);
+            errorState.classList.toggle('hide', !showError);
+            emptyState.classList.toggle('hide', !showEmpty);
+            gridContainer.classList.toggle('hide', !showGrid);
+        }
+
+        // Fungsi proteksi XSS untuk menggantikan special characters dengan value yang aman
+        function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+        }
+
+        // Get CSRF Token from cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Build Endorsement Component (Ported from skill_endorsement.html)
+        function buildEndorsementHtml(skill, skillId) {
+            const isEndorsed = skill.is_endorsed ?? false;
+            const endorseCount = skill.endorse_count ?? 0;
+
+            let endorsersArray = [];
+            if (Array.isArray(skill.endorsers)) {
+                endorsersArray = skill.endorsers;
+            } else if (typeof skill.endorsed_by_names === 'string' && skill.endorsed_by_names.trim() !== '') {
+                endorsersArray = skill.endorsed_by_names.split(',').map(name => name.trim()).filter(Boolean);
+            }
+
+            const isEndorsedClass = isEndorsed ? ' is-endorsed' : '';
+            const endorseUrl = "{% url 'main:toggle_endorsement' '00000000-0000-0000-0000-000000000000' %}"
+                .replace('00000000-0000-0000-0000-000000000000', skillId);
+
+            // Build Tooltip HTML
+            let tooltipContentHtml = '';
+            if (endorsersArray.length > 0) {
+                const topEndorsers = endorsersArray.slice(0, 5);
+                const listItems = topEndorsers.map(name => `<li>${escapeHtml(name)}</li>`).join('');
+                
+                const remainingCount = endorseCount > topEndorsers.length 
+                    ? endorseCount - topEndorsers.length 
+                    : 0;
+
+                const moreHtml = remainingCount > 0 
+                    ? `<div class="tooltip-more">+${remainingCount} lainnya</div>` 
+                    : '';
+
+                tooltipContentHtml = `
+                    <ul class="tooltip-list">
+                        ${listItems}
+                    </ul>
+                    ${moreHtml}
+                `;
+            } else {
+                tooltipContentHtml = `<div class="tooltip-empty">Jadilah yang pertama!</div>`;
+            }
+
+            return `
+                <div class="endorse-tooltip-wrapper">
+                    <form method="post" action="${endorseUrl}" class="skill-endorse-form" onsubmit="toggleEndorseAjax(event, '${endorseUrl}')">
+                        {% csrf_token %}
+                        <button type="submit" class="button skill-button-endorse${isEndorsedClass}">
+                            <span aria-hidden="true">✓</span>
+                            <span class="skill-endorse-count">${endorseCount}</span>
+                        </button>
+                    </form>
+
+                    <div class="endorse-tooltip" role="tooltip">
+                        <div class="tooltip-title">Diendorse oleh:</div>
+                        ${tooltipContentHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Membuat elemen skill card
+        function buildSkillCardElement(item) {
+            const skill = item.fields;
+            const skillId = item.pk;
+
+            const cardElement = document.createElement('div');
+            cardElement.className = 'bento-card';
+            
+            const safeTitle = escapeHtml(skill.title);
+            const safeIconPath = escapeHtml(skill.icon_path);
+            const safeDescription = escapeHtml(skill.description);
+
+            // Dummy UUID untuk digantikan ID asli dari data JSON
+            const endorseUrl = "{% url 'main:toggle_endorsement' '00000000-0000-0000-0000-000000000000' %}"
+                .replace('00000000-0000-0000-0000-000000000000', skillId);
+            const deleteUrl = "{% url 'main:delete_skill' '00000000-0000-0000-0000-000000000000' %}"
+                .replace('00000000-0000-0000-0000-000000000000', skillId);
+
+            // Dynamic Action Buttons
+            const deleteHtml = IS_SUPERUSER ?
+                `<button type="button"
+                class="delete-modal__close"
+                popovertarget="delete-experience-modal"
+                popovertargetaction="hide"
+                aria-label="Tutup konfirmasi hapus"
+                onclick="openDeleteModal('${deleteUrl}', '${safeTitle}')">×</button>`
+                : '';
+
+            const iconHtml = safeIconPath 
+                ? `<div class="card-header">
+                       <img src="${safeIconPath}" alt="${safeTitle} logo" class="skill-icon-svg" />
+                   </div>`
+                : '';
+
+            const descHtml = safeDescription 
+                ? `<p class="skill-description">${safeDescription}</p>` 
+                : '';
+            
+            const endorsementHtml = buildEndorsementHtml(skill, skillId);
+
+            cardElement.innerHTML = `
+                ${iconHtml}
+                <div class="card-body">
+                    <h3>${safeTitle}</h3>
+                    ${endorsementHtml}
+                    ${descHtml}
+                    ${deleteHtml}
+                </div>
+            `;
+
+            return cardElement;
+        }
+
+        // Fungsi untuk membuka modal delete skill
+        function openDeleteModal(deleteUrl, title) {
+            const modal = document.getElementById('delete-skill-modal');
+            const form = document.getElementById('delete-modal-form');
+            const titleElem = document.getElementById('delete-modal-item-title');
+
+            form.action = deleteUrl;
+            titleElem.textContent = title;
+            modal.showPopover();
+        }
+
+        // const CREATE_EXPERIENCE_ENDPOINT = "{% url 'main:create_experience_ajax' %}";
+        // const experienceForm = document.getElementById('experience-form');
+
+        // // Mengirim data form ke server
+        // async function addExperience(event) {
+        //     event.preventDefault();
+
+        //     const submitButton = experienceForm.querySelector('button[type="submit"]');
+        //     submitButton.disabled = true;
+
+        //     try {
+        //         const response = await fetch(CREATE_EXPERIENCE_ENDPOINT, {
+        //             method: 'POST',
+        //             headers: { 'X-CSRFToken': getCookie('csrftoken') },
+        //             body: new FormData(experienceForm),
+        //         });
+        //         const result = await response.json().catch(() => ({}));
+
+        //         if (response.ok) {
+        //             experienceForm.reset();
+        //             closeExperienceModal();
+        //             showToast('Berhasil', 'Proyek baru berhasil ditambahkan!', 'success');
+        //             fetchExperiences(searchInput.value.trim());
+        //         } else {
+        //             const errorMessages = result.errors
+        //                 ? Object.values(result.errors).flat().map(error => error.message)
+        //                 : [result.message || `Terjadi kesalahan (status ${response.status}).`];
+        //             showToast('Gagal menambahkan proyek', errorMessages.join(' '), 'error');
+        //         }
+        //     } catch (error) {
+        //         console.error('Error adding pengalaman:', error);
+        //         showToast('Gagal menambahkan proyek', 'Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
+        //     } finally {
+        //         submitButton.disabled = false;
+        //     }
+        // }
+        
+        // // Membuat event listener untuk submit form addExperience
+        // if (experienceForm) {
+        //     experienceForm.addEventListener('submit', addExperience);
+        // }
+
+         // Fungsi untuk menutup modal add-experience
+        // function closeSkillModal() {
+        //     document.getElementById("add-skill-modal").hidePopover();
+        // }
+
+        // Fetch data skill via AJAX
+        async function fetchSkills(searchQuery = "") {
+            if (skillsAbortController) skillsAbortController.abort();
+            skillsAbortController = new AbortController();
+
+            try {
+                displayPageSection({ showLoading: true });
+                
+                const url = searchQuery 
+                    ? `${BASE_SKILLS_ENDPOINT}?cat=${encodeURIComponent(searchQuery)}` 
+                    : BASE_SKILLS_ENDPOINT;
+                
+                const response = await fetch(url, {
+                    headers: { 'Accept': 'application/json' },
+                    signal: skillsAbortController.signal,
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch data');
+
+                const skillData = await response.json();
+
+                if (skillData.length === 0) {
+                    displayPageSection({ showEmpty: true });
+                } else {
+                    gridContainer.innerHTML = '';
+                    skillData.forEach(item => {
+                        gridContainer.appendChild(buildSkillCardElement(item));
+                    });
+                    displayPageSection({ showGrid: true });
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                console.error('Error loading skills:', error);
+                displayPageSection({ showError: true });
+            }
+        }
+
+        // Event listeners for category filter pills
+        categoryPills.forEach(pill => {
+            pill.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                categoryPills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+
+                const selectedCategory = this.getAttribute('data-category') || '';
+                
+                clearTimeout(searchDebounceTimer);
+
+                searchDebounceTimer = setTimeout(() => {
+                    fetchSkills(selectedCategory);
+                }, SEARCH_DEBOUNCE_DELAY);
+            });
+        });
+        
+
+        // Start application
+        const initialCategory = new URLSearchParams(window.location.search).get('cat') || '';
+        fetchSkills(initialCategory);
+    </script>
+{% endblock script %}

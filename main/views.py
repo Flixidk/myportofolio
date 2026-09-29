@@ -204,18 +204,6 @@ def toggle_star(request, experience_id):
 def show_skill(request):
     selected_category = request.GET.get('cat', 'all')
 
-    # Fetch and deserialize JSON data
-    json_response = get_skill_json(request)
-    skill_data = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-    skills_list = [skill.object for skill in skill_data]
-
-    # Filter by category
-    if selected_category and selected_category != 'all':
-        skills_list = [s for s in skills_list if getattr(s, 'category', None) == selected_category]
-
     categories = [
         ('all', 'All'),
         ('frontend', 'Frontend'),
@@ -225,10 +213,10 @@ def show_skill(request):
     ]
 
     context = {
-        "name" : "Nanta",
-        "skills_list" : skills_list,
+        "name": "Nanta",
         "categories" : categories,
         'selected_category' : selected_category,
+        "form": SkillForm(),
     }
     return render(request, "skill.html", context)
 
@@ -251,14 +239,33 @@ def create_skill(request):
     return render(request, "skill_form.html", context)
 
 def get_skill_json(request):
-    title_query = request.GET.get("title", "").strip()
-    skill_list = Skill.objects.all()
+    selected_category = request.GET.get('cat', 'all')
+    skills_list = Skill.objects.prefetch_related('endorsed_by').all()
 
-    if title_query:
-        skill_list = skill_list.filter(title__icontains=title_query)
+    # Filter by category
+    if selected_category and selected_category != 'all':
+        skills_list = [s for s in skills_list if getattr(s, 'category', None) == selected_category]
 
-    skill_json = serializers.serialize("json", skill_list, use_natural_foreign_keys=True)
-    return HttpResponse(skill_json, content_type="application/json")
+    data = []
+    for skill in skills_list:
+        endorsed_users = skill.endorsed_by.all()
+        is_endorsed = request.user in endorsed_users if request.user.is_authenticated else False
+        endorsed_by_names = ", ".join([u.username for u in endorsed_users])
+
+        data.append({
+            "pk": str(skill.id),
+            "fields": {
+                "title": skill.title,
+                "description": skill.description,
+                "category": skill.get_category_display(),
+                "icon_path" : skill.icon_path,
+                "endorse_count": endorsed_users.count(),
+                "is_endorsed": is_endorsed,
+                "endorsed_by_names": endorsed_by_names,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
 
 @login_required(login_url='/login/')
 def delete_skill(request, skill_id):
