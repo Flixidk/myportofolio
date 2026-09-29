@@ -22,7 +22,7 @@
 
         <form id="experience-form"
               method="post"
-              action="{% url 'main:create_experience' %}"
+              action="{% url 'main:create_experience_ajax' %}"
               class="form">
             {% csrf_token %}
             {% for field in form %}

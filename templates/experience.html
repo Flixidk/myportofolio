@@ -23,7 +23,8 @@
                     {% if user.is_superuser %} 
                         <button type="button"
                                 class="button experience-add-button"
-                                popovertarget="add-experience-modal">
+                                popovertarget="add-experience-modal"
+                                onclick="openAddModal()">
                             <span aria-hidden="true">+</span>
                             Tambah Pengalaman
                         </button>
@@ -58,9 +59,13 @@
     <script>
         // Konfigurasi
         const BASE_EXPERIENCES_ENDPOINT = "{% url 'main:get_experience_json' %}";
+        const CREATE_EXPERIENCE_ENDPOINT = "{% url 'main:create_experience_ajax' %}";
+        const EDIT_EXPERIENCE_ENDPOINT = "{% url 'main:edit_experience_ajax' '00000000-0000-0000-0000-000000000000' %}";
         const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
         const CAN_EDIT = "{% if perms.main.change_experience %}true{% else %}false{% endif %}" === "true";
+        
         let experiencesAbortController;
+        let currentExperiences = [];
 
         // Elemen DOM
         const loadingState = document.getElementById('loading');
@@ -69,6 +74,7 @@
         const gridContainer = document.getElementById('grid');
         const searchForm = document.getElementById('experience-search-form');
         const searchInput = document.getElementById('search-input');
+        const experienceForm = document.getElementById('experience-form');
         const SEARCH_DEBOUNCE_DELAY = 300;
         let searchDebounceTimer;
 
@@ -80,51 +86,120 @@
             gridContainer.classList.toggle('hide', !showGrid);
         }
 
-        // Fungsi proteksi XSS untuk menggantikan special characters dengan value yang aman
+        // Proteksi XSS
         function escapeHtml(value) {
-        return String(value ?? '')
-            .replaceAll('&', '&amp;')
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
-            .replaceAll('"', '&quot;')
-            .replaceAll("'", '&#39;');
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#39;');
         }
 
-        // Membuat elemen Metro Station Card
+        // Get CSRF Token from cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Reset Modal to "Add Mode"
+        function openAddModal() {
+            if (!experienceForm) return;
+            
+            experienceForm.reset();
+            experienceForm.dataset.mode = 'add';
+            delete experienceForm.dataset.editId;
+
+            const titleElem = document.getElementById('add-experience-modal-title');
+            const submitBtn = experienceForm.querySelector('button[type="submit"]');
+
+            if (titleElem) titleElem.textContent = 'Tambah Pengalaman Baru';
+            if (submitBtn) submitBtn.textContent = 'Tambah Pengalaman';
+        }
+
+        // Open Modal in "Edit Mode" and populate input values
+        function openEditModal(experienceId) {
+            const exp = currentExperiences.find(item => item.pk === experienceId);
+            if (!exp || !experienceForm) return;
+
+            experienceForm.reset();
+            experienceForm.dataset.mode = 'edit';
+            experienceForm.dataset.editId = experienceId;
+
+            const fields = exp.fields;
+            if (experienceForm.elements['title']) experienceForm.elements['title'].value = fields.title || '';
+            if (experienceForm.elements['category']) experienceForm.elements['category'].value = fields.category || '';
+            if (experienceForm.elements['description']) experienceForm.elements['description'].value = fields.description || '';
+            if (experienceForm.elements['started_at']) experienceForm.elements['started_at'].value = fields.started_at || '';
+            if (experienceForm.elements['ended_at']) experienceForm.elements['ended_at'].value = fields.ended_at || '';
+
+            const titleElem = document.getElementById('add-experience-modal-title');
+            const submitBtn = experienceForm.querySelector('button[type="submit"]');
+
+            if (titleElem) titleElem.textContent = 'Edit Pengalaman';
+            if (submitBtn) submitBtn.textContent = 'Simpan Perubahan';
+
+            const modal = document.getElementById('add-experience-modal');
+            if (modal) modal.showPopover();
+        }
+
+        // Open Delete Modal
+        function openDeleteModal(deleteUrl, title) {
+            const modal = document.getElementById('delete-experience-modal');
+            const form = document.getElementById('delete-modal-form');
+            const titleElem = document.getElementById('delete-modal-item-title');
+
+            if (modal && form && titleElem) {
+                form.action = deleteUrl;
+                titleElem.textContent = title;
+                modal.showPopover();
+            }
+        }
+
+        // Close Add/Edit Modal
+        function closeExperienceModal() {
+            const modal = document.getElementById("add-experience-modal");
+            if (modal) modal.hidePopover();
+        }
+
+        // Card Element Builder
         function buildExperienceCardElement(item) {
             const experience = item.fields;
             const experienceId = item.pk;
 
-            // Outer container matching original <div class="metro-station year-YYYY">
             const stationElement = document.createElement('div');
             
-            // Parse years from date strings (e.g., "2026-09-28" -> "2026")
             const startYear = experience.started_at ? escapeHtml(experience.started_at.split('-')[0]) : '';
-            const endYear = experience.ended_at ? escapeHtml(experience.ended_at.split('-')[0]) : 'Present';
+            const endYear = escapeHtml(experience.ended_at.split('-')[0]);
 
-            stationElement.className = `metro-station year-${startYear}`;
+            stationElement.className = `metro-station year-${endYear}`;
 
-            // Dummy UUID untuk digantikan ID asli dari data JSON
             const starUrl = "{% url 'main:toggle_star' '00000000-0000-0000-0000-000000000000' %}"
                 .replace('00000000-0000-0000-0000-000000000000', experienceId);
             const deleteUrl = "{% url 'main:delete_experience' '00000000-0000-0000-0000-000000000000' %}"
                 .replace('00000000-0000-0000-0000-000000000000', experienceId);
-            const editUrl = "{% url 'main:edit_experience' '00000000-0000-0000-0000-000000000000' %}"
-                .replace('00000000-0000-0000-0000-000000000000', experienceId);
 
             const safeTitle = escapeHtml(experience.title);
-            const safeCategory = escapeHtml(experience.category);
+            const safeCategory = escapeHtml(experience.category_display || experience.category);
             const safeDescription = escapeHtml(experience.description);
             const safeStarredByNames = escapeHtml(experience.starred_by_names);
 
-            // Star state details
             const isStarredClass = experience.is_starred ? " is-starred" : "";
             const starText = experience.is_starred ? "Unstar" : "Star";
             const starTitle = experience.star_count > 0 
                 ? `Dibintangi oleh ${safeStarredByNames}` 
                 : "Jadilah yang pertama memberi star";
 
-            // Dynamic Action Buttons
             const deleteHtml = IS_SUPERUSER 
                 ? `<button type="button" 
                         class="button button-danger" 
@@ -132,7 +207,9 @@
                 : '';
 
             const editHtml = CAN_EDIT
-                ? `<a href="${editUrl}" class="button button-secondary">Edit</a>`
+                ? `<button type="button" 
+                        class="button button-secondary" 
+                        onclick="openEditModal('${experienceId}')">Edit</button>`
                 : '';
 
             stationElement.innerHTML = `
@@ -163,50 +240,23 @@
             return stationElement;
         }
 
-        // Fungsi untuk menutup modal add-experience
-        function closeExperienceModal() {
-            document.getElementById("add-experience-modal").hidePopover();
-        }
-
-        // Fungsi untuk membuka modal delete experience
-        function openDeleteModal(deleteUrl, title) {
-            const modal = document.getElementById('delete-experience-modal');
-            const form = document.getElementById('delete-modal-form');
-            const titleElem = document.getElementById('delete-modal-item-title');
-
-            form.action = deleteUrl;
-            titleElem.textContent = title;
-            modal.showPopover();
-        }
-
-        const CREATE_EXPERIENCE_ENDPOINT = "{% url 'main:create_experience_ajax' %}";
-        const experienceForm = document.getElementById('experience-form');
-
-        // Membaca nilai cookie, digunakan untuk mengambil token CSRF
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        // Mengirim data form ke server
-        async function addExperience(event) {
+        // Handles both Create and Edit form submissions via AJAX
+        async function saveExperience(event) {
             event.preventDefault();
+            if (!experienceForm) return;
 
             const submitButton = experienceForm.querySelector('button[type="submit"]');
-            submitButton.disabled = true;
+            if (submitButton) submitButton.disabled = true;
+
+            const isEdit = experienceForm.dataset.mode === 'edit';
+            const editId = experienceForm.dataset.editId;
+
+            const targetUrl = isEdit 
+                ? EDIT_EXPERIENCE_ENDPOINT.replace('00000000-0000-0000-0000-000000000000', editId)
+                : CREATE_EXPERIENCE_ENDPOINT;
 
             try {
-                const response = await fetch(CREATE_EXPERIENCE_ENDPOINT, {
+                const response = await fetch(targetUrl, {
                     method: 'POST',
                     headers: { 'X-CSRFToken': getCookie('csrftoken') },
                     body: new FormData(experienceForm),
@@ -216,25 +266,32 @@
                 if (response.ok) {
                     experienceForm.reset();
                     closeExperienceModal();
-                    showToast('Berhasil', 'Proyek baru berhasil ditambahkan!', 'success');
+                    if (typeof showToast === 'function') {
+                        showToast('Berhasil', isEdit ? 'Pengalaman berhasil diperbarui!' : 'Pengalaman baru berhasil ditambahkan!', 'success');
+                    }
                     fetchExperiences(searchInput.value.trim());
                 } else {
                     const errorMessages = result.errors
                         ? Object.values(result.errors).flat().map(error => error.message)
                         : [result.message || `Terjadi kesalahan (status ${response.status}).`];
-                    showToast('Gagal menambahkan proyek', errorMessages.join(' '), 'error');
+                    if (typeof showToast === 'function') {
+                        showToast('Gagal menyimpan pengalaman', errorMessages.join(' '), 'error');
+                    } else {
+                        alert(errorMessages.join(' '));
+                    }
                 }
             } catch (error) {
-                console.error('Error adding pengalaman:', error);
-                showToast('Gagal menambahkan proyek', 'Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
+                console.error('Error saving experience:', error);
+                if (typeof showToast === 'function') {
+                    showToast('Gagal menyimpan pengalaman', 'Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
+                }
             } finally {
-                submitButton.disabled = false;
+                if (submitButton) submitButton.disabled = false;
             }
         }
-        
-        // Membuat event listener untuk submit form addExperience
+
         if (experienceForm) {
-            experienceForm.addEventListener('submit', addExperience);
+            experienceForm.addEventListener('submit', saveExperience);
         }
 
         // Fetch data experience via AJAX
@@ -257,6 +314,7 @@
                 if (!response.ok) throw new Error('Failed to fetch data');
 
                 const experienceData = await response.json();
+                currentExperiences = experienceData; // Store globally for editing lookup
 
                 if (experienceData.length === 0) {
                     displayPageSection({ showEmpty: true });
@@ -274,21 +332,15 @@
             }
         }
 
-        // Fungsi untuk menjalankan fetchExperience dengan searchInput yang diketik
         function searchExperiences() {
             fetchExperiences(searchInput.value.trim());
         }
 
-        // Event listener untuk search bar dengan debounce 
         searchInput.addEventListener("input", function() {
             clearTimeout(searchDebounceTimer);
-
-            searchDebounceTimer = setTimeout(function() {
-                searchExperiences();
-            }, SEARCH_DEBOUNCE_DELAY);
+            searchDebounceTimer = setTimeout(searchExperiences, SEARCH_DEBOUNCE_DELAY);
         });
 
-        // Event listener untuk search bar melalui manual submit
         searchForm.addEventListener("submit", function(event) {
             event.preventDefault();
             clearTimeout(searchDebounceTimer);
