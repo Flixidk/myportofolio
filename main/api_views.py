@@ -2,10 +2,9 @@ from django.db.models import F
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.decorators import (
-    api_view, authentication_classes, permission_classes,
-)
+from rest_framework.decorators import (api_view, authentication_classes, permission_classes,)
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from main.models import Experience
 from main.permissions import IsPortfolioOwnerOrReadOnly
@@ -52,5 +51,17 @@ def experience_detail(request, experience_id):
     )
     serializer.is_valid(raise_exception=True)
     serializer.save()
+    return Response(serializer.data)
+
+@api_view(["POST"])
+@authentication_classes([SessionAuthentication])
+@permission_classes([IsAuthenticated])
+def experience_star(request, experience_id):
+    experience = get_object_or_404(Experience, pk=experience_id)
+    if experience.starred_by.filter(pk=request.user.pk).exists():
+        experience.starred_by.remove(request.user)
+    else:
+        experience.starred_by.add(request.user)
+    serializer = ExperienceSerializer(experience, context={"request": request})
     return Response(serializer.data)
 

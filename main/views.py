@@ -3,14 +3,12 @@ import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.contrib.auth.decorators import login_required, permission_required  
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied        
 from django.contrib import messages
-from django.core import serializers
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
-from main.models import Experience
 from main.models import Skill
 from .forms import ExperienceForm, SkillForm
 
@@ -82,96 +80,6 @@ def show_experience(request):
         "form": ExperienceForm(),
     }
     return render(request, "experience.html", context)
-
-@login_required(login_url="/login/")
-@require_POST
-def create_experience_ajax(request):
-    if not request.user.is_superuser:
-        return JsonResponse(
-            {"message": "Hanya pemilik portofolio yang dapat menambahkan pengalaman."},
-            status=403,
-        )
-
-    form = ExperienceForm(request.POST)
-    if form.is_valid():
-        experience = form.save()
-        return JsonResponse(
-            {"message": "Pengalaman berhasil ditambahkan.", "pk": str(experience.id)},
-            status=201,
-        )
-
-    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
-
-@login_required(login_url="/login/")
-@permission_required("main.change_experience", raise_exception=True)
-@require_POST
-def edit_experience_ajax(request, experience_id):
-    experience = get_object_or_404(Experience, id=experience_id)
-    form = ExperienceForm(request.POST, instance=experience)
-    
-    if form.is_valid():
-        form.save()
-        return JsonResponse({"message": "Pengalaman berhasil diperbarui."}, status=200)
-
-    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
-
-def get_experience_json(request):
-    title_query = request.GET.get("title", "").strip()
-    experience_list = Experience.objects.prefetch_related('starred_by').all()
-
-    if title_query:
-        experience_list = experience_list.filter(title__icontains=title_query)
-
-    data = []
-    for experience in experience_list:
-        starred_users = experience.starred_by.all()
-        is_starred = request.user in starred_users if request.user.is_authenticated else False
-        starred_by_names = ", ".join([u.username for u in starred_users])
-
-        data.append({
-            "pk": str(experience.id),
-            "fields": {
-                "title": experience.title,
-                "description": experience.description,
-                "category" : experience.category,
-                "category_display": experience.get_category_display(),
-                "started_at" : str(experience.started_at) if experience.started_at else None,
-                "ended_at" : str(experience.ended_at),
-                "star_count": starred_users.count(),
-                "is_starred": is_starred,
-                "starred_by_names": starred_by_names,
-            }
-        })
-
-    return JsonResponse(data, safe=False)
-
-@login_required(login_url="/login/")
-def delete_experience(request, experience_id):
-    if not request.user.is_superuser:
-        raise PermissionDenied
-    
-    experience = get_object_or_404(Experience, pk=experience_id)
-
-    if request.method == "POST":
-        experience.delete()
-        messages.success(request, "Pengalaman berhasil dihapus!")
-        return redirect("main:show_experience")
-
-    return redirect("main:show_experience")
-
-@login_required(login_url="/login/")
-def toggle_star(request, experience_id):
-    experience = get_object_or_404(Experience, pk=experience_id)
-
-    if request.method == "POST":
-        # Kalau akun ini sudah pernah memberi star, batalkan star-nya.
-        # Kalau belum, tambahkan star
-        if request.user in experience.starred_by.all():
-            experience.starred_by.remove(request.user)
-        else:
-            experience.starred_by.add(request.user)
-
-    return redirect("main:show_experience")
 
 ''' =========================
     Functions for Skill Page
