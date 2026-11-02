@@ -48,8 +48,11 @@
         </section>
     </main>
 
-{% if user.is_superuser %}
+{% if can_edit_experience %}
     {% include "components/experience_form_modal.html" %}
+{% endif %}
+
+{% if user.is_superuser %}
     {% include "components/experience_delete_modal.html" %}
 {% endif %}
 
@@ -66,6 +69,7 @@
         const LOGIN_URL = "{% url 'main:login' %}";
         const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
         const IS_AUTHENTICATED = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
+        const CAN_EDIT = "{{ can_edit_experience|yesno:'true,false' }}" === "true";
 
         let experiencesAbortController;
         let currentExperiences = [];
@@ -243,7 +247,7 @@
                         data-action="delete" data-id="${id}" data-title="${safeTitle}">Hapus</button>`
                 : '';
 
-            const editHtml = IS_SUPERUSER
+            const editHtml = CAN_EDIT
                 ? `<button type="button" class="button button-secondary"
                         data-action="edit" data-id="${id}">Edit</button>`
                 : '';

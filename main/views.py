@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
 from main.models import Skill
+from main.permissions import user_is_editor
 from .forms import ExperienceForm, SkillForm
 
 ''' =============================
@@ -73,10 +74,12 @@ def show_main(request):
     ============================= '''
 def show_experience(request):
     title_query = request.GET.get("title", "").strip()
+    can_edit_experience = request.user.is_superuser or user_is_editor(request.user)
 
     context = {
         "name": "Nanta",
         "title_query" : title_query,
+        "can_edit_experience": can_edit_experience,
         "form": ExperienceForm(),
     }
     return render(request, "experience.html", context)
