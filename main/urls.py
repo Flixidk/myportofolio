@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 
 from main.views import *
 
@@ -24,4 +24,7 @@ urlpatterns = [
     path("api/skill", get_skill_json, name="get_skill_json"),
     path("skill/<uuid:skill_id>/delete/",delete_skill, name="delete_skill"),
     path("skill/<uuid:skill_id>/endorse/", toggle_endorsement, name="toggle_endorsement",),
+
+    path("api/v1/", include("main.api_urls")),
+    path("api-auth/", include("rest_framework.urls")),
 ]
