@@ -5,24 +5,15 @@
      aria-modal="true"
      aria-labelledby="add-experience-modal-title">
      
-    <button type="button"
-            class="experience-form-modal__backdrop"
-            popovertarget="add-experience-modal"
-            popovertargetaction="hide"
-            aria-label="Tutup form tambah pengalaman"></button>
+    <button type="button" class="experience-form-modal__backdrop" popovertarget="add-experience-modal" popovertargetaction="hide" aria-label="Tutup form tambah pengalaman"></button>
 
     <div class="experience-form-modal__content">
-        <button type="button"
-                class="experience-form-modal__close"
-                popovertarget="add-experience-modal"
-                popovertargetaction="hide"
-                aria-label="Tutup form tambah pengalaman">×</button>
+        <button type="button" class="experience-form-modal__close" popovertarget="add-experience-modal" popovertargetaction="hide" aria-label="Tutup form tambah pengalaman">×</button>
 
         <h2 id="add-experience-modal-title">Tambah Pengalaman Baru</h2>
 
         <form id="experience-form"
               method="post"
-              action="{% url 'main:create_experience_ajax' %}"
               class="form">
             {% csrf_token %}
             {% for field in form %}
@@ -36,10 +27,7 @@
             {% endfor %}
 
             <div class="experience-form-modal__actions">
-                <button type="button"
-                        class="button button-secondary"
-                        popovertarget="add-experience-modal"
-                        popovertargetaction="hide">Batal</button>
+                <button type="button" class="button button-secondary" popovertarget="add-experience-modal" popovertargetaction="hide">Batal</button>
                 <button type="submit" class="button">Tambah Pengalaman</button>
             </div>
         </form>

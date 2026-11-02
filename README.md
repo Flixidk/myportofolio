@@ -61,6 +61,7 @@ Open http://localhost:8000 in your browser.
 - psycopg2-binary: Database driver for PostgreSQL integration.
 - python-dotenv: Reads secrets securely from .env.
 - requests & urllib3: Facilitates external API communication.
+- Django Rest Framework : Internal API framework. 
 
 ---
 ## 📚 Weekly Documentation & AI Disclosure
