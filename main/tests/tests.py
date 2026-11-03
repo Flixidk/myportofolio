@@ -1,4 +1,3 @@
-import json
 from datetime import date
 
 from django.contrib.auth.models import User
@@ -6,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from main.models import Experience, Skill
+from main.forms import ExperienceForm, SkillForm
 
 
 class PortfolioPageTests(TestCase):
@@ -42,95 +42,112 @@ class PortfolioPageTests(TestCase):
         self.assertContains(response, reverse("api:experience-list"))
         self.assertNotContains(response, self.experience.title)
 
-    def test_skill_page_renders_category_filters_and_json_endpoint(self):
+    def test_skill_page_renders_category_filters_and_api_endpoint(self):
         response = self.client.get(reverse("main:show_skill"), {"cat": "backend"})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "skill.html")
         self.assertContains(response, 'data-category="backend"')
-        self.assertContains(response, reverse("main:get_skill_json"))
+        self.assertContains(response, reverse("api:skill-list"))
         self.assertNotContains(response, self.skill.title)
 
     def test_models_have_readable_names(self):
         self.assertEqual(str(self.experience), "Event Staff")
         self.assertEqual(str(self.skill), "Python")
 
+    def test_experience_ongoing_property(self):
+        ongoing = Experience(title="Current Role", description="Still working", ended_at=None)
+        self.assertTrue(ongoing.is_ongoing)
+        self.assertFalse(self.experience.is_ongoing)
 
-class SkillEndpointTests(TestCase):
-    def setUp(self):
-        self.skill = Skill.objects.create(
-            title="Python", category="backend", description="Basic syntax", order=1
-        )
-        self.other_skill = Skill.objects.create(
-            title="HTML", category="frontend", description="Markup", order=2
-        )
 
-    def test_skill_json_returns_current_payload(self):
-        response = self.client.get(reverse("main:get_skill_json"))
+class AuthenticationPageTests(TestCase):
+    def test_register_page_and_successful_registration(self):
+        register_url = reverse("main:register")
+        self.assertEqual(self.client.get(register_url).status_code, 200)
+
+        response = self.client.post(register_url, {
+            "username": "newstudent",
+            "password1": "A-strong-test-password-839!",
+            "password2": "A-strong-test-password-839!",
+        })
+        self.assertRedirects(response, reverse("main:login"))
+        self.assertTrue(User.objects.filter(username="newstudent").exists())
+
+    def test_invalid_registration_renders_errors(self):
+        response = self.client.post(reverse("main:register"), {
+            "username": "newstudent",
+            "password1": "A-strong-test-password-839!",
+            "password2": "different-password",
+        })
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/json")
-        data = json.loads(response.content)
-        self.assertEqual([item["fields"]["title"] for item in data], ["Python", "HTML"])
-        self.assertEqual(data[0]["fields"]["category"], "Backend")
-        self.assertEqual(data[0]["fields"]["endorse_count"], 0)
-        self.assertFalse(data[0]["fields"]["is_endorsed"])
+        self.assertTemplateUsed(response, "register.html")
+        self.assertContains(response, "password")
+        self.assertFalse(User.objects.filter(username="newstudent").exists())
 
-    def test_skill_json_filters_by_category(self):
-        response = self.client.get(reverse("main:get_skill_json"), {"cat": "backend"})
-        data = json.loads(response.content)
-        self.assertEqual([item["fields"]["title"] for item in data], ["Python"])
+    def test_login_page_successful_login_and_logout(self):
+        user = User.objects.create_user(username="returning", password="A-strong-test-password-839!")
+        login_url = reverse("main:login")
+        self.assertEqual(self.client.get(login_url).status_code, 200)
 
-    def test_skill_json_includes_endorsement_state_for_signed_in_user(self):
-        user = User.objects.create_user(username="student", password="password")
-        self.skill.endorsed_by.add(user)
-        self.client.force_login(user)
-        data = json.loads(self.client.get(reverse("main:get_skill_json")).content)
-        self.assertEqual(data[0]["fields"]["endorsed_by_names"], "student")
-        self.assertTrue(data[0]["fields"]["is_endorsed"])
+        response = self.client.post(login_url, {
+            "username": "returning",
+            "password": "A-strong-test-password-839!",
+        })
+        self.assertRedirects(response, reverse("main:show_main"))
+        self.assertIn("last_login", response.cookies)
 
-    def test_skill_creation_requires_superuser_and_valid_payload(self):
-        url = reverse("main:create_skill_ajax")
-        payload = {"title": "Django", "category": "backend", "description": "Framework", "icon_path": "", "order": 0}
+        logout_response = self.client.get(reverse("main:logout"))
+        self.assertRedirects(logout_response, reverse("main:show_main"))
+        self.assertEqual(logout_response.cookies["last_login"].value, "")
 
-        self.assertEqual(self.client.post(url, payload).status_code, 302)
-        regular_user = User.objects.create_user(username="student", password="password")
-        self.client.force_login(regular_user)
-        self.assertEqual(self.client.post(url, payload).status_code, 403)
-        owner = User.objects.create_superuser(username="owner", email="owner@example.com", password="password")
-        self.client.force_login(owner)
-        response = self.client.post(url, payload)
-        self.assertEqual(response.status_code, 201)
-        self.assertTrue(Skill.objects.filter(title="Django").exists())
-        self.assertIn("pk", json.loads(response.content))
+    def test_invalid_login_renders_login_form(self):
+        response = self.client.post(reverse("main:login"), {
+            "username": "missing-user",
+            "password": "wrong-password",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "login.html")
 
-    def test_skill_creation_rejects_invalid_payload(self):
-        owner = User.objects.create_superuser(username="owner", email="owner@example.com", password="password")
-        self.client.force_login(owner)
-        response = self.client.post(reverse("main:create_skill_ajax"), {"title": "<b></b>"})
-        self.assertEqual(response.status_code, 400)
-        self.assertIn("errors", json.loads(response.content))
 
-    def test_endorsement_toggles_for_authenticated_user(self):
-        user = User.objects.create_user(username="student", password="password")
-        url = reverse("main:toggle_endorsement", kwargs={"skill_id": self.skill.pk})
-        self.assertEqual(self.client.post(url).status_code, 302)
-        self.client.force_login(user)
-        self.client.post(url)
-        self.assertTrue(self.skill.endorsed_by.filter(pk=user.pk).exists())
-        self.client.post(url)
-        self.assertFalse(self.skill.endorsed_by.filter(pk=user.pk).exists())
+class FormCleaningTests(TestCase):
+    def test_experience_form_strips_html_from_title_and_description(self):
+        form = ExperienceForm(data={
+            "title": " <b>Research Assistant</b> ",
+            "description": " <p>Built a <strong>prototype</strong>.</p> ",
+            "category": "research",
+            "started_at": "2025-01-01",
+            "ended_at": "2025-06-01",
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.cleaned_data["title"], "Research Assistant")
+        self.assertEqual(form.cleaned_data["description"], "Built a prototype.")
 
-    def test_delete_skill_is_owner_only_and_post_only(self):
-        url = reverse("main:delete_skill", kwargs={"skill_id": self.skill.pk})
-        self.assertEqual(self.client.get(url).status_code, 302)
-        user = User.objects.create_user(username="student", password="password")
-        self.client.force_login(user)
-        self.assertEqual(self.client.post(url).status_code, 403)
-        owner = User.objects.create_superuser(username="owner", email="owner@example.com", password="password")
-        self.client.force_login(owner)
-        self.assertEqual(self.client.get(url).status_code, 302)
-        self.assertTrue(Skill.objects.filter(pk=self.skill.pk).exists())
-        self.client.post(url)
-        self.assertFalse(Skill.objects.filter(pk=self.skill.pk).exists())
+    def test_experience_form_rejects_title_containing_only_html(self):
+        form = ExperienceForm(data={
+            "title": "<b></b>", "description": "Description", "category": "research",
+            "started_at": "2025-01-01", "ended_at": "2025-06-01",
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn("title", form.errors)
+
+    def test_skill_form_cleans_title_description_and_icon_path(self):
+        form = SkillForm(data={
+            "title": " <b>Django</b> ", "category": "backend",
+            "description": " <p>Web framework</p> ",
+            "icon_path": " <b>https://example.com/django.svg</b> ", "order": 1,
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.cleaned_data["title"], "Django")
+        self.assertEqual(form.cleaned_data["description"], "Web framework")
+        self.assertEqual(form.cleaned_data["icon_path"], "https://example.com/django.svg")
+
+    def test_skill_form_rejects_title_containing_only_html(self):
+        form = SkillForm(data={
+            "title": "<b></b>", "category": "backend", "description": "Description",
+            "icon_path": "", "order": 1,
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn("title", form.errors)
 
 
 class ExperienceApiTests(TestCase):

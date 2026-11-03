@@ -18,11 +18,11 @@
                 popovertargetaction="hide"
                 aria-label="Tutup form tambah skill">×</button>
 
-        <h2 id="add-skill-modal-title">Tambah Pengalaman Baru</h2>
+        <h2 id="add-skill-modal-title">Tambah Skill Baru</h2>
 
         <form id="skill-form"
               method="post"
-              action="{% url 'main:create_skill_ajax' %}"
+              action="{% url 'api:skill-list' %}"
               class="form">
             {% csrf_token %}
             {% for field in form %}
