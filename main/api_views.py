@@ -73,7 +73,7 @@ def experience_star(request, experience_id):
     return Response(serializer.data)
 
 @api_view(["GET", "HEAD", "POST"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsPortfolioOwnerOrReadOnly])
 def skill_list(request):
     if request.method in ("GET", "HEAD"):
@@ -92,7 +92,7 @@ def skill_list(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 @api_view(["GET", "HEAD", "PUT", "PATCH", "DELETE"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
 def skill_detail(request, skill_id):
     skill = get_object_or_404(Skill.objects.prefetch_related("endorsed_by"), pk=skill_id,)
@@ -110,7 +110,7 @@ def skill_detail(request, skill_id):
     return Response(serializer.data)
 
 @api_view(["POST"])
-@authentication_classes([SessionAuthentication])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def skill_endorse(request, skill_id):
     skill = get_object_or_404(Skill, pk=skill_id)
